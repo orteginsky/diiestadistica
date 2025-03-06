@@ -1,0 +1,45 @@
+diiestadistica/
+│── diiestadistica/                # Carpeta principal de la librería
+│   ├── procesamiento/          # Módulo de procesamiento de datos
+│   │   ├── __init__.py
+│   │   ├── limpieza_datos.py
+│   │   ├── normalizacion.py
+│   │   ├── validacion.py
+│   │
+│   ├── informes/               # Módulo de generación de informes
+│   │   ├── __init__.py
+│   │   ├── generar_excel.py
+│   │   ├── generar_pdf.py
+│   │   ├── graficos.py
+│   │
+│   ├── conexion/               # Módulo de conexión a bases de datos/APIs
+│   │   ├── __init__.py
+│   │   ├── conectar_sql.py
+│   │   ├── conectar_api.py
+│   │
+│   ├── utils/                  # Funciones auxiliares y configuración
+│   │   ├── __init__.py
+│   │   ├── manejo_logs.py
+│   │   ├── config.py
+│   │
+│   ├── gui/                    # Interfaz gráfica
+│   │   ├── interfaz.py
+│
+│── tests/                      # Pruebas unitarias
+│   ├── test_procesamiento.py
+│   ├── test_informes.py
+│
+│── docs/                       # Documentación del proyecto
+│   ├── index.md
+│   ├── instalación.md
+│   ├── uso.md
+│
+│── ejemplos/                   # Scripts de ejemplo para usuarios
+│   ├── ejemplo_limpieza.py
+│   ├── ejemplo_reporte.py
+│
+│── requirements.txt            # Lista de dependencias necesarias
+│── setup.py                    # Empaquetado de la librería
+│── README.md                   # Descripción del proyecto
+│── .gitignore                  # Archivos a ignorar en Git
+
