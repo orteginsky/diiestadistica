@@ -45,13 +45,13 @@ from .seleccionar_opcion import seleccionar_opcion_nivel
 from .seleccionar_opcion import seleccionar_opcion_combo
 from .descargar_reportes import descargar_reportes
 from .descargar_reportes import descargar_reportes_nivel
-from .credenciales import ingresar_credenciales
+from .credenciales import credenciales
 
 # Configura el navegador
 driver = webdriver.Chrome()
 
 # Ingresa a la página correspondiente e ingresa las credenciales
-driver = ingresar_credenciales(driver)
+driver = credenciales(driver)
 
 # Buscar todos los enlaces dentro del div con id "menuAux"
 menu_aux = driver.find_element(By.ID, "menuAux")
