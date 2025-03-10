@@ -6,9 +6,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 import time
-from .descargar_reportes import descargar_reportes
+from .descargar_reportes import descargar_reportes, descargar_reportes_nivel
+from .descargar_reportes import descargar_reportes_nivel_2
 
-def seleccionar_opcion(driver, palabra, numero=1):
+def seleccionar_opcion(driver, palabra, concepto):
     """
     Función para seleccionar una opción de un combo box en base a una palabra clave.
     
@@ -36,11 +37,9 @@ def seleccionar_opcion(driver, palabra, numero=1):
         # Filtra las opciones eliminando elementos vacíos
         opciones_validas = [opcion for opcion in opciones if opcion.text.strip()]
 
-        if opciones_validas:
-            opciones_validas[-numero].click()  # Selecciona la opción desde el final de la lista
-        else:
-            print("No hay opciones válidas o el número es demasiado grande")
-
+        for i in opciones_validas:
+            if concepto in i.text.strip():
+                i.click()
     except Exception as e:
         print(f"Error al seleccionar la opción: {e}")
 
@@ -115,3 +114,78 @@ def seleccionar_opcion_combo(driver, palabra):
 
     except Exception as e:
         print(f"Error al seleccionar el combo box con la palabra '{palabra}': {e}")
+
+
+
+
+def seleccionar_opcion_combo_descarga(driver, palabra, descarga):
+    """
+    Encuentra y selecciona una opción en un combo box basado en un <td> que contiene una palabra clave.
+
+    :param driver: WebDriver de Selenium
+    :param palabra: Texto dentro del <td> que identifica el combo box
+    """
+    try:
+        # Encuentra el <td> que contiene la palabra clave
+        xpath_td = f"//td[@class='backgroundtableForm' and text()='{palabra}']"
+        td_elemento = driver.find_element(By.XPATH, xpath_td)
+
+        # Selecciona el <div> dentro del mismo <tr> que contiene el combo box
+        div_combo = td_elemento.find_element(By.XPATH, "./following-sibling::td//div[@class='dhx_combo_box']")
+
+        # Haz clic en el combo box para desplegar las opciones
+        div_combo.click()
+
+        # Espera hasta que aparezcan las opciones del combo
+        opciones = WebDriverWait(driver, 5).until(
+            EC.presence_of_all_elements_located((By.XPATH, "//div[contains(@class, 'dhx_combo_list')]/div"))
+        )
+
+        # Encuentra la primera opción válida y haz clic
+        for opcion in opciones:
+            if opcion.text.strip():  # Verifica que la opción no esté vacía
+                opcion.click()
+                print(f"Seleccionada la opción: {opcion.text.strip()}")
+                descargar_reportes_nivel(driver, descarga)
+                time.sleep(4)  # Espera antes de cerrar el combo
+                div_combo.click()
+
+    except Exception as e:
+        print(f"Error al seleccionar el combo box con la palabra '{palabra}': {e}")
+
+
+def seleccionar_opcion_combo_descarga_2(driver, palabra, descarga):
+    """
+    Encuentra y selecciona una opción en un combo box basado en un <td> que contiene una palabra clave.
+
+    :param driver: WebDriver de Selenium
+    :param palabra: Texto dentro del <td> que identifica el combo box
+    """
+    try:
+        # Encuentra el <td> que contiene la palabra clave
+        xpath_td = f"//td[@class='backgroundtableForm' and text()='{palabra}']"
+        td_elemento = driver.find_element(By.XPATH, xpath_td)
+
+        # Selecciona el <div> dentro del mismo <tr> que contiene el combo box
+        div_combo = td_elemento.find_element(By.XPATH, "./following-sibling::td//div[@class='dhx_combo_box']")
+
+        # Haz clic en el combo box para desplegar las opciones
+        div_combo.click()
+
+        # Espera hasta que aparezcan las opciones del combo
+        opciones = WebDriverWait(driver, 5).until(
+            EC.presence_of_all_elements_located((By.XPATH, "//div[contains(@class, 'dhx_combo_list')]/div"))
+        )
+
+        # Encuentra la primera opción válida y haz clic
+        for opcion in opciones:
+            if opcion.text.strip():  # Verifica que la opción no esté vacía
+                opcion.click()
+                print(f"Seleccionada la opción: {opcion.text.strip()}")
+                descargar_reportes_nivel_2(driver, descarga)
+                time.sleep(4)  # Espera antes de cerrar el combo
+                div_combo.click()
+
+    except Exception as e:
+        print(f"Error al seleccionar el combo box con la palabra '{palabra}': {e}")
+

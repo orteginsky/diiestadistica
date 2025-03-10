@@ -1,9 +1,7 @@
 
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
 import time
 
 def descargar_reportes_nivel(driver, descarga):
@@ -34,7 +32,6 @@ def descargar_reportes_nivel(driver, descarga):
     except Exception as e:
         print(f"Error: {e}")
 
-
 def descargar_reportes(driver):
     """
     Hace clic en todas las imágenes <img src='/images/excel.png'> que estén visibles en la página.
@@ -61,5 +58,17 @@ def descargar_reportes(driver):
 
     except Exception as e:
         print(f"Error al hacer al hacer click en descarga: {e}")
+
+def ultimo_reporte(driver):
+    elementos = driver.find_elements(By.XPATH, "//img[@src='/images/excel.png']")
+    # Verificar si se encontraron elementos
+    if elementos:
+        # Seleccionar el último elemento de la lista
+        ultimo_elemento = elementos[-1]
+        # Hacer clic en el último elemento
+        ultimo_elemento.click()
+    else:
+        print("No se encontraron elementos con src='/images/excel.png'")
+
 
 

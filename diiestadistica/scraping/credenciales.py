@@ -5,6 +5,7 @@ import time
 def credenciales(driver,d_usuario="cglara",d_contraseña="ZyK8nEEA"):
 
     try:
+        
         # Abre la página de inicio de sesión
         driver.get("https://intranet.sge.ipn.mx/")
 
@@ -30,7 +31,8 @@ def credenciales(driver,d_usuario="cglara",d_contraseña="ZyK8nEEA"):
 
         # Espera a que el contenido dinámico se cargue
         time.sleep(2)
-        
+        return(driver)
     except:
         print("Se produjo un Error")
+        return(driver)
         

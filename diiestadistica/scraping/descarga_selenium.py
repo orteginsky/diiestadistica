@@ -40,12 +40,21 @@ from selenium.webdriver.common.keys import Keys
 import time
 import pandas as pd
 
-from .seleccionar_opcion import seleccionar_opcion
-from .seleccionar_opcion import seleccionar_opcion_nivel
+from .seleccionar_opcion import seleccionar_opcion, seleccionar_opcion_combo_descarga
+from .seleccionar_opcion import seleccionar_opcion_nivel, seleccionar_opcion_combo_descarga_2
 from .seleccionar_opcion import seleccionar_opcion_combo
 from .descargar_reportes import descargar_reportes
 from .descargar_reportes import descargar_reportes_nivel
 from .credenciales import credenciales
+
+# Crear lista de conceptos que se van a descargar
+conceptos = ['Aprovechamiento Escolar por Sexo',
+             'Egresados',
+             'Matrícula Inscrita Medio Superior',
+             'Matrícula Inscrita Nivel Superior',
+             'Matrícula Inscrita Nivel Posgrado',
+             'Matrícula Inscrita Por Grupos De Edad',
+             'Titulación']
 
 # Configura el navegador
 driver = webdriver.Chrome()
@@ -67,16 +76,25 @@ for link in links:
 # Crear DataFrame
 df = pd.DataFrame(data)
 
-# Crear lista de conceptos
-conceptos = ['Aprovechamiento Escolar',
-             'Egresados',
-             'Matrícula Inscrita Medio Superior',
-             'Matrícula Inscrita Nivel Superior',
-             'Matrícula Inscrita Nivel Posgrado',
-             'Matrícula Inscrita Por Grupos De Edad',
-             'Titulación']
-
 df = df[df['text'].isin(conceptos)]
+
+#_________________________T O D O ____ B I E N______A R R I B A_____________
+año_inicio = 2023
+año_fin = 2024
+semestre = 2
+
+ciclo_incio = str(año_inicio) + " - " + str(año_fin)
+semestre_inicio = "/" + str(semestre) 
+
+if semestre == 2:
+    ciclo_fin = ciclo_incio
+    semestre_fin = "/1"
+elif semestre == 1:
+    ciclo_fin = str((año_inicio - 1)) + " - " + str((año_fin - 1))
+    semestre_fin = "/2"
+else:
+    print("Selección de periodo fuera de rango") 
+
 
 
 for index, row in df.iterrows():
@@ -84,34 +102,58 @@ for index, row in df.iterrows():
     text = f"{row['text']}"
     driver.get(pagina)
     time.sleep(2)
-    if text == "Aprovechamiento Escolar" or text == "Egresados" or text == "Titulación":
-        seleccionar_opcion(driver, "Ciclo Escolar:", 2)
+    if text == "Aprovechamiento Escolar por Sexo":
+        seleccionar_opcion(driver, "Ciclo Escolar:", ciclo_fin)
         time.sleep(2)
-        seleccionar_opcion(driver, "Periodo:", 1)
+        seleccionar_opcion(driver, "Periodo:", semestre_fin)
         time.sleep(2)
-        seleccionar_opcion_combo(driver, "Nivel:")
+        descarga = ["concentrado"]
+        seleccionar_opcion_combo_descarga(driver, "Nivel:", descarga)
         time.sleep(1)
+    elif text == "Egresados":
+        seleccionar_opcion(driver, "Ciclo Escolar:", ciclo_fin)
+        time.sleep(2)
+        seleccionar_opcion(driver, "Periodo:", semestre_fin)
+        time.sleep(2)
+        descarga =[""]
+        seleccionar_opcion_combo_descarga_2(driver, "Nivel:", descarga)
+        time.sleep(1)
+    elif text == "Titulación":
+        seleccionar_opcion(driver, "Ciclo Escolar:", ciclo_fin)
+        time.sleep(2)
+        seleccionar_opcion(driver, "Periodo:", semestre_fin)
+        time.sleep(2)
+        descarga = ["concentrado"]
+        seleccionar_opcion_combo_descarga(driver, "Nivel:", descarga)
+        time.sleep(1)
+    elif text=="Matrícula Inscrita Medio Superior":
+        seleccionar_opcion(driver, "Ciclo Escolar:", ciclo_incio)
+        time.sleep(2)
+        seleccionar_opcion(driver, "Periodo:", semestre_inicio)
+        time.sleep(2)
+        descarga = ["concentradoMatriculaInscrita","concentradoPASemestreSexo","concentradoTurno"]
+    elif text=="Matrícula Inscrita Nivel Superior":
+        seleccionar_opcion(driver, "Ciclo Escolar:", ciclo_incio)
+        time.sleep(2)
+        seleccionar_opcion(driver, "Periodo:", semestre_inicio)
+        time.sleep(2)
+        descarga = ["concentradoMatriculaEducativa","concentradoPASemestreSexo","concentradoTurno"]
+    elif text=="Matrícula Inscrita Nivel Posgrado":
+        seleccionar_opcion(driver, "Ciclo Escolar:", ciclo_incio)
+        time.sleep(2)
+        seleccionar_opcion(driver, "Periodo:", semestre_inicio)
+        time.sleep(2)
+        descarga = ["concentradoMatriculaSuperior","concentrado2","concentradoTurno"]
+    elif text=="Matrícula Inscrita Por Grupos De Edad":
+        #seleccionar_opcion_combo(driver, "Nivel:")
+        #time.sleep(1)
+        print("ok")
     else:
-        seleccionar_opcion(driver, "Ciclo Escolar:", 1)
-        time.sleep(2)
-        seleccionar_opcion(driver, "Periodo:", 1)
-        time.sleep(2)
-        if text != "Matrícula Inscrita Por Grupos De Edad":
-            if text=="Matrícula Inscrita Medio Superior":
-                descarga = ["concentradoMatriculaInscrita","concentradoMatInsSemestreGrupos_NMS","concentradoPASemestreSexo","concentradoTurno"]
-            elif text=="Matrícula Inscrita Nivel Superior":
-                descarga = ["concentradoMatriculaEducativa","concentradoPASemestreSexo","concentradoGruposPorSemestre","concentradoTurno"]
-            elif text=="Matrícula Inscrita Nivel Posgrado":
-                descarga = ["concentrado","concentradoMatriculaSuperior","concentrado2","concentradoTurno"]
-            else:
-                descarga = []    
-            seleccionar_opcion_nivel(driver,"Nivel:",1)
-            time.sleep(3)
-            descargar_reportes_nivel(driver,descarga)
-        else:
-            seleccionar_opcion_combo(driver, "Nivel:")
-            time.sleep(1)
+        print("error concepto fuera de rango")
 
 
 # Cierra el navegador
+time.sleep(4)
 driver.quit()
+
+#CENTROS DE EDUCACIÓN

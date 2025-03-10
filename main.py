@@ -5,3 +5,6 @@ if __name__ == "__main__":
     # Configura el navegador
     driver = webdriver.Chrome()
     hola_mundo()
+    
+    # Cierra el navegador
+    driver.quit()
