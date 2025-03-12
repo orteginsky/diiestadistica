@@ -5,10 +5,11 @@ from ..scraping.credenciales import credenciales
 from selenium import webdriver
 from tkinter.ttk import *
 from ..scraping.descarga_selenium import descarga_selenium
-
+import re
 import os
 import shutil
 import platform
+
 def limpiar_descargas():
     # Detectar la carpeta de Descargas según el sistema operativo
     if platform.system() == "Windows":
@@ -68,30 +69,41 @@ def agregar_ciclo_box(nueva_ventana):
 
 def agregar_periodo_box(nueva_ventana):
     periodo_var = tk.StringVar()
-    combobox = ttk.Combobox(
+    combobox_1 = ttk.Combobox(
         nueva_ventana,
         textvariable=periodo_var,
         values=[1,2],
         state="readonly"
         )
-    combobox.pack(pady=10)
-    combobox.current(1)
-    return combobox
+    combobox_1.pack(pady=10)
+    combobox_1.current(1)
+    return combobox_1
 
 def reemplazar_ventana(ventana_actual,titulo,subtitulo):
     ventana_actual.destroy() 
     ventana = ventana_base(titulo,subtitulo)
     return ventana
 
-def activar_descarga_intranet():
-    driver=webdriver.Chrome()
-    driver=credenciales(driver)
-
-def agregar_selenium(nueva_ventana):
-    color_fondo = "#5A1236"
-    boton_cerrar = tk.Button(nueva_ventana, text="Inciar Descarga", font=("Arial", 12), 
-                             command=activar_descarga_intranet, bg="#FFFFFF", fg=color_fondo)
-    boton_cerrar.pack(pady=10)
+def activar_descarga_intranet(ciclo,periodo):
+    anio_actual = datetime.now().year
+    mes_actual = datetime.now().month
+    anio_coincidencia = re.search(r"\d+", ciclo)
+    periodo_coincidencia = re.search(r"\d",periodo)
+    if anio_coincidencia:
+        if periodo_coincidencia:
+            anio_inicio = int(anio_coincidencia.group())
+            semestre_inicio = int(periodo_coincidencia.group())
+            if (anio_inicio!=anio_actual or (mes_actual>=8 and semestre_inicio==1 and anio_inicio==anio_actual)):
+                print("todo bien")
+                descarga_selenium(anio_inicio,semestre_inicio)
+            else:
+                print("Nada bien")
+                return
+        else:
+            return            
+    else:
+        print("No se encontró ningún número en el elemento.")
+        return
 
 def limpiar_pestaña(frame):
     for widget in frame.winfo_children():

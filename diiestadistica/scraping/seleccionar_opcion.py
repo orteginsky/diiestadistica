@@ -1,13 +1,12 @@
 
-
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
+
 import time
 from .descargar_reportes import descargar_reportes, descargar_reportes_nivel, ultimo_reporte
 
+niveles=["MEDIO SUPERIOR","SUPERIOR","POSGRADO"]
 ########################################################################################
 def seleccionar_opcion(driver, palabra, concepto):
     """
@@ -27,7 +26,7 @@ def seleccionar_opcion(driver, palabra, concepto):
         
         # Haz clic en el <div> para desplegar las opciones
         div_combo.click()
-        time.sleep(1)  # Espera breve para desplegar las opciones
+        time.sleep(1)
 
         # Encuentra las opciones disponibles
         opciones = WebDriverWait(driver, 5).until(
@@ -62,7 +61,7 @@ def seleccionar_opcion_nivel(driver, palabra, numero=1):
         
         # Haz clic en el <div> para desplegar las opciones
         div_combo.click()
-        time.sleep(1)  # Espera breve para desplegar las opciones
+        time.sleep(1)
 
         # Encuentra las opciones disponibles
         opciones = WebDriverWait(driver, 5).until(
@@ -73,7 +72,7 @@ def seleccionar_opcion_nivel(driver, palabra, numero=1):
         opciones_validas = [opcion for opcion in opciones if opcion.text.strip()]
 
         if opciones_validas and numero <= len(opciones_validas):
-            opciones_validas[-numero].click()  # Selecciona la opción desde el final de la lista
+            opciones_validas[-numero].click()
         else:
             print("No hay opciones válidas o el número es demasiado grande")
 
@@ -106,12 +105,13 @@ def seleccionar_opcion_combo(driver, palabra):
 
         # Encuentra la primera opción válida y haz clic
         for opcion in opciones:
-            if opcion.text.strip():  # Verifica que la opción no esté vacía
-                opcion.click()
-                print(f"Seleccionada la opción: {opcion.text.strip()}")
-                descargar_reportes(driver)
-                time.sleep(4)  # Espera antes de cerrar el combo
-                div_combo.click()
+            if opcion.text.strip():
+                if opcion.text.strip() in niveles:
+                    opcion.click()
+                    print(f"Seleccionada la opción: {opcion.text.strip()}")
+                    descargar_reportes(driver)
+                    time.sleep(4)
+                    div_combo.click()
 
     except Exception as e:
         print(f"Error al seleccionar el combo box con la palabra '{palabra}': {e}")
@@ -144,12 +144,13 @@ def seleccionar_opcion_combo_descarga(driver, palabra, descarga):
 
         # Encuentra la primera opción válida y haz clic
         for opcion in opciones:
-            if opcion.text.strip():  # Verifica que la opción no esté vacía
-                opcion.click()
-                print(f"Seleccionada la opción: {opcion.text.strip()}")
-                descargar_reportes_nivel(driver, descarga)
-                time.sleep(4)  # Espera antes de cerrar el combo
-                div_combo.click()
+            if opcion.text.strip():
+                if opcion.text.strip() in niveles:
+                    opcion.click()
+                    print(f"Seleccionada la opción: {opcion.text.strip()}")
+                    descargar_reportes_nivel(driver, descarga)
+                    time.sleep(4)
+                    div_combo.click()
 
     except Exception as e:
         print(f"Error al seleccionar el combo box con la palabra '{palabra}': {e}")

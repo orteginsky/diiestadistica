@@ -3,7 +3,7 @@
 Created on Thu Feb 10  2025
 
 @author: Luis Alberto Ortega Ramirez
-Nombre del archivo: intranet_selenium.py
+Nombre del archivo: descargar_selenium.py
 
 Contexto: 
     
@@ -45,7 +45,7 @@ from .seleccionar_opcion import seleccionar_opcion_egresados
 from .seleccionar_opcion import seleccionar_opcion_combo
 from .credenciales import credenciales
 
-def descarga_selenium(año_inicio = 2023, año_fin = 2024, semestre = 2):
+def descarga_selenium(año_inicio = 2023, semestre = 2):
     # Crear lista de conceptos que se van a descargar
     conceptos = ['Aprovechamiento Escolar por Sexo',
                 'Egresados',
@@ -77,14 +77,14 @@ def descarga_selenium(año_inicio = 2023, año_fin = 2024, semestre = 2):
 
     df = df[df['text'].isin(conceptos)]
 
-    ciclo_incio = str(año_inicio) + " - " + str(año_fin)
+    ciclo_incio = str(año_inicio) + " - " + str((año_inicio+1))
     semestre_inicio = "/" + str(semestre) 
 
     if semestre == 2:
         ciclo_fin = ciclo_incio
         semestre_fin = "/1"
     elif semestre == 1:
-        ciclo_fin = str((año_inicio - 1)) + " - " + str((año_fin - 1))
+        ciclo_fin = str((año_inicio - 1)) + " - " + str((año_inicio))
         semestre_fin = "/2"
     else:
         print("Selección de periodo fuera de rango") 
@@ -141,7 +141,7 @@ def descarga_selenium(año_inicio = 2023, año_fin = 2024, semestre = 2):
             descarga = ["concentradoMatriculaSuperior","concentrado2","concentradoTurno"]
             seleccionar_opcion_combo_descarga(driver, "Nivel:", descarga)
         elif text=="Matrícula Inscrita Por Grupos De Edad":
-            seleccionar_opcion(driver, "Ciclo Escolar:", ciclo_fin)
+            seleccionar_opcion(driver, "Ciclo Escolar:", ciclo_incio)
             time.sleep(2)
             seleccionar_opcion(driver, "Periodo:", semestre_inicio)
             time.sleep(2)
@@ -157,4 +157,5 @@ def descarga_selenium(año_inicio = 2023, año_fin = 2024, semestre = 2):
     time.sleep(70)
     driver.quit()
 
-descarga_selenium()
+if __name__ == "__main__":
+    descarga_selenium()

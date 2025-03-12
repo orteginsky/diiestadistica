@@ -3,9 +3,10 @@
 
 import tkinter as tk
 from tkinter import ttk
-from .ventana_base import ventana_base, activar_descarga_intranet, agregar_boton
+from .ventana_base import ventana_base, agregar_boton
 from .ventana_base import agregar_ciclo_box, limpiar_descargas, agregar_periodo_box
 from .ventana_base import estilizar_pestañas
+from .ventana_base import activar_descarga_intranet
 
 
 def quitar():
@@ -21,12 +22,13 @@ def limpiar():
     ir_a_pestaña_n(2)
     limpiar_descargas()
 
-def descargar(ciclos):
+def descargar(ciclos, periodos):
     print("se ha confirmado y se empezara a descargar tio")
     ir_a_pestaña_n(3)
     ciclo = ciclos.get()
-    print(ciclo)
-    activar_descarga_intranet()
+    periodo = periodos.get()
+    print(ciclo,periodo)
+    activar_descarga_intranet(ciclo,periodo)
 def mapre():
     print("hostia tio ya esta generandose el mapre")
     quitar()
@@ -59,11 +61,11 @@ notebook.add(frame_limpieza, text="Limpieza Descargas")
 # Pestaña Ingreso de Datos
 frame_datos = ttk.Frame(notebook)
 ciclos = agregar_ciclo_box(frame_datos)
-#periodos = agregar_periodo_box(frame_datos)
+periodos = agregar_periodo_box(frame_datos)
 datos_regresar = agregar_boton(frame_datos,"Regresar")
 datos_regresar.config(command=lambda: ir_a_pestaña_n(1))
 datos_Confirmar = agregar_boton(frame_datos,"Confirmar Selección")
-datos_Confirmar.config(command=lambda: descargar(ciclos))
+datos_Confirmar.config(command=lambda: descargar(ciclos,periodos))
 notebook.add(frame_datos, text="Ingreso de Datos")
 
 # Pestaña Procesamiento de Informes
