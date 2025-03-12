@@ -6,9 +6,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 import time
-from .descargar_reportes import descargar_reportes, descargar_reportes_nivel
-from .descargar_reportes import descargar_reportes_nivel_2
+from .descargar_reportes import descargar_reportes, descargar_reportes_nivel, ultimo_reporte
 
+########################################################################################
 def seleccionar_opcion(driver, palabra, concepto):
     """
     Función para seleccionar una opción de un combo box en base a una palabra clave.
@@ -43,6 +43,7 @@ def seleccionar_opcion(driver, palabra, concepto):
     except Exception as e:
         print(f"Error al seleccionar la opción: {e}")
 
+########################################################################################
 def seleccionar_opcion_nivel(driver, palabra, numero=1):
     """
     Función para seleccionar una opción de un combo box en base a una palabra clave.
@@ -79,7 +80,7 @@ def seleccionar_opcion_nivel(driver, palabra, numero=1):
     except Exception as e:
         print(f"Error al seleccionar la opción: {e}")
 
-
+########################################################################################
 def seleccionar_opcion_combo(driver, palabra):
     """
     Encuentra y selecciona una opción en un combo box basado en un <td> que contiene una palabra clave.
@@ -116,7 +117,7 @@ def seleccionar_opcion_combo(driver, palabra):
         print(f"Error al seleccionar el combo box con la palabra '{palabra}': {e}")
 
 
-
+########################################################################################
 
 def seleccionar_opcion_combo_descarga(driver, palabra, descarga):
     """
@@ -153,8 +154,8 @@ def seleccionar_opcion_combo_descarga(driver, palabra, descarga):
     except Exception as e:
         print(f"Error al seleccionar el combo box con la palabra '{palabra}': {e}")
 
-
-def seleccionar_opcion_combo_descarga_2(driver, palabra, descarga):
+########################################################################################
+def seleccionar_opcion_egresados(driver, palabra):
     """
     Encuentra y selecciona una opción en un combo box basado en un <td> que contiene una palabra clave.
 
@@ -177,15 +178,17 @@ def seleccionar_opcion_combo_descarga_2(driver, palabra, descarga):
             EC.presence_of_all_elements_located((By.XPATH, "//div[contains(@class, 'dhx_combo_list')]/div"))
         )
 
-        # Encuentra la primera opción válida y haz clic
         for opcion in opciones:
-            if opcion.text.strip():  # Verifica que la opción no esté vacía
-                opcion.click()
-                print(f"Seleccionada la opción: {opcion.text.strip()}")
-                descargar_reportes_nivel_2(driver, descarga)
-                time.sleep(4)  # Espera antes de cerrar el combo
+            if opcion.text.strip():
+                if opcion.text.strip() == "POSGRADO":
+                    opcion.click()
+                    descargar_reportes(driver)
+                    time.sleep(4)
+                else:
+                    opcion.click()
+                    ultimo_reporte(driver)
+                    time.sleep(4)
                 div_combo.click()
 
     except Exception as e:
         print(f"Error al seleccionar el combo box con la palabra '{palabra}': {e}")
-

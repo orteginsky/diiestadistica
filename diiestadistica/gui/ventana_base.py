@@ -4,6 +4,7 @@ from datetime import datetime
 from ..scraping.credenciales import credenciales
 from selenium import webdriver
 from tkinter.ttk import *
+from ..scraping.descarga_selenium import descarga_selenium
 
 import os
 import shutil
@@ -63,6 +64,18 @@ def agregar_ciclo_box(nueva_ventana):
     combobox = ttk.Combobox(nueva_ventana, textvariable=ciclo_var, values=ciclos_anuales, state="readonly")
     combobox.pack(pady=10)
     combobox.current(len(ciclos_anuales) - 1)
+    return combobox
+
+def agregar_periodo_box(nueva_ventana):
+    periodo_var = tk.StringVar()
+    combobox = ttk.Combobox(
+        nueva_ventana,
+        textvariable=periodo_var,
+        values=[1,2],
+        state="readonly"
+        )
+    combobox.pack(pady=10)
+    combobox.current(1)
     return combobox
 
 def reemplazar_ventana(ventana_actual,titulo,subtitulo):

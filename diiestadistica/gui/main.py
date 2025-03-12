@@ -4,7 +4,7 @@
 import tkinter as tk
 from tkinter import ttk
 from .ventana_base import ventana_base, activar_descarga_intranet, agregar_boton
-from .ventana_base import agregar_ciclo_box, limpiar_descargas
+from .ventana_base import agregar_ciclo_box, limpiar_descargas, agregar_periodo_box
 from .ventana_base import estilizar_pestañas
 
 
@@ -59,6 +59,7 @@ notebook.add(frame_limpieza, text="Limpieza Descargas")
 # Pestaña Ingreso de Datos
 frame_datos = ttk.Frame(notebook)
 ciclos = agregar_ciclo_box(frame_datos)
+#periodos = agregar_periodo_box(frame_datos)
 datos_regresar = agregar_boton(frame_datos,"Regresar")
 datos_regresar.config(command=lambda: ir_a_pestaña_n(1))
 datos_Confirmar = agregar_boton(frame_datos,"Confirmar Selección")
