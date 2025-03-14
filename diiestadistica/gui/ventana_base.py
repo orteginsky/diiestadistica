@@ -35,7 +35,7 @@ def limpiar_descargas():
         except Exception as e:
             print(f"Error al eliminar {item_path}: {e}")
 
-    print("🗑️ Carpeta de Descargas limpiada correctamente.")
+    print("Carpeta de Descargas limpiada correctamente.")
 
 def ventana_base(nueva_ventana,titulo="M A P R E"):
     nueva_ventana.title(titulo)
