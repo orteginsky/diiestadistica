@@ -37,6 +37,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 import time
 import pandas as pd
 
@@ -45,7 +47,25 @@ from .seleccionar_opcion import seleccionar_opcion_egresados
 from .seleccionar_opcion import seleccionar_opcion_combo
 from .credenciales import credenciales
 
-def descarga_selenium(año_inicio = 2023, semestre = 2):
+
+def descarga_selenium(año_inicio = 2023, semestre = 2, download_path = "C:/"):
+    """
+    # Configurar opciones de Chrome
+    chrome_options = Options()
+    prefs = {
+        "download.default_directory": download_path,
+        "download.prompt_for_download": False,
+        "download.directory_upgrade": True,
+        "safebrowsing.enabled": False
+    }
+
+    chrome_options.add_experimental_option("prefs", prefs)
+    prefs["profile.default_content_setting_values.automatic_downloads"] = 1
+    
+    # Configura el navegador
+    driver = webdriver.Chrome(options=chrome_options)
+    """
+
     # Crear lista de conceptos que se van a descargar
     conceptos = ['Aprovechamiento Escolar por Sexo',
                 'Egresados',
@@ -54,10 +74,7 @@ def descarga_selenium(año_inicio = 2023, semestre = 2):
                 'Matrícula Inscrita Nivel Posgrado',
                 'Matrícula Inscrita Por Grupos De Edad',
                 'Titulación']
-
-    # Configura el navegador
     driver = webdriver.Chrome()
-
     # Ingresa a la página correspondiente e ingresa las credenciales
     driver = credenciales(driver)
 
@@ -150,12 +167,15 @@ def descarga_selenium(año_inicio = 2023, semestre = 2):
             print("ok")
         else:
             print("error concepto fuera de rango")
-
-    #_________________________T O D O ____ B I E N______A R R I B A_____________
-
+        
     # Cierra el navegador
     time.sleep(70)
     driver.quit()
 
+#_________________________T O D O ____ B I E N______A R R I B A_____________
+
 if __name__ == "__main__":
-    descarga_selenium()
+    from ..procesamiento.seleccionar_carpeta import seleccionar_carpeta
+    download_path=seleccionar_carpeta()
+    print(f"Ruta seleccionada: {download_path}")
+    descarga_selenium(download_path=download_path)
