@@ -1,4 +1,4 @@
-from .validacion_html import validar_rectangulo
+from .validacion_html import validar_rectangulo, uno
 from .capitalizar import capitalizar
 from .seleccionar_carpeta import seleccionar_carpeta
 from .creacion_tabla import expandir_tabla, definir_encabezados
@@ -39,8 +39,7 @@ def reorganizar_datos(dataframe):
     columnas_pivote = [col for col in dataframe.columns if "_" in col]
 
     # Realizar la transformación a formato largo
-    df_long = dataframe.melt(id_vars=columnas_fijas, value_vars=columnas_pivote, 
-                      var_name="dividir", value_name="Datos")
+    df_long = dataframe.melt(id_vars=columnas_fijas, value_vars=columnas_pivote, var_name="dividir", value_name="Datos")
 
     # Separar la columna "dividir" en varias columnas usando "_"
     columnas_creadas = df_long["dividir"].str.split("_", expand=True)
@@ -52,7 +51,7 @@ def reorganizar_datos(dataframe):
     df_long[nombres_columnas_creadas] = columnas_creadas
 
     # Convertir la columna "Datos" a entero
-    df_long["Datos"] = pd.to_numeric(df_long["Datos"], errors="coerce")
+    #df_long["Datos"] = pd.to_numeric(df_long["Datos"], errors="coerce")
 
     # Retornar el DataFrame reorganizado
     return df_long.drop(columns=["dividir"])
@@ -120,38 +119,8 @@ def correccion_conceptos(dataframe):
     return dataframe
 
 
-if __name__ == "__main__":
-    # Seleccionar un archivo y abrirlo para procesarlo
-    from .validacion_html import procesar_tabla_html
-    ruta_carpeta = seleccionar_carpeta()
-    nombre_archivo = os.listdir(ruta_carpeta)[11]
-    ruta_archivo = f"{ruta_carpeta}/{nombre_archivo}"
-    print(ruta_archivo)
-    with open(ruta_archivo, "r", encoding="latin-1") as archivo_html:
-        soup = BeautifulSoup(archivo_html, "html.parser")
+def anti_join(df1, df2, left_on, right_on):
+    inner_join = pd.merge(df1, df2, left_on=left_on, right_on=right_on, how='inner')
+    return df1[~df1[left_on].isin(inner_join[left_on])]
 
-    # Extraer los encabezados
-    soup_encabezados = soup.find("thead")
-    # Extraer matriz de matrices
-    encabezados_matriz = procesar_tabla_html(soup_encabezados)
-    # Expandir tabla de encabezados
-    encabezados_df = expandir_tabla(encabezados_matriz)
-
-    # Extraer los datos
-    datos_html = soup.find("tbody", {"border": "1"})
-    # Extraer matriz de matrices de datos
-    datos_matriz = procesar_tabla_html(soup=datos_html)
-    # Expandir datos
-    datos_exp = expandir_tabla(datos_matriz)
-    # Cambiar los colnames
-    datos_exp.columns = definir_encabezados(encabezados_df)
-    # Eliminar subtotales
-    datos_exp = eliminar_columnas_subtotales(datos_exp)
-    # pivotear datos
-    datos_exp = reorganizar_datos(datos_exp)
-    # Depurar programas
-    datos_exp = limpiar_nombres_programas(datos_exp, "Programas.Academicos")
-    # depurar conceptos
-    datos_exp = correccion_conceptos(datos_exp)
-    print(datos_exp)
-    #ruta_guardar = f"{ruta_carpeta}/prueba.xlsx"
+    
