@@ -54,6 +54,8 @@ def expandir_tabla(lista_matrices):
         return pd.DataFrame(tabla_expandida)
 
 
+import re
+
 def definir_encabezados(dataframe):
     # Transponer el DataFrame
     datos_transpuesta = dataframe.T.copy()
@@ -67,12 +69,18 @@ def definir_encabezados(dataframe):
     # Verificar si todas las columnas de una fila son iguales a la primera columna
     iguales_a_primera_columna = datos_transpuesta.eq(datos_transpuesta.iloc[:, 0], axis=0).all(axis=1)
 
-    # Generar nombres de columnas: si todas las celdas de una fila son iguales, tomar solo la primera, sino concatenar
-    nombres_columnas = datos_transpuesta.apply(lambda row: row.iloc[0] if iguales_a_primera_columna[row.name] 
-                                               else '_'.join(row), axis=1)
-    
+    # Generar nombres de columnas
+    nombres_columnas = datos_transpuesta.apply(
+        lambda row: row.iloc[0] if iguales_a_primera_columna[row.name] 
+        else '_'.join(row.map(str).map(str.strip)), axis=1
+    )
+
     # Limpiar los nombres de columnas
     nombres_columnas = nombres_columnas.apply(limpiar_nombre_columna)
 
+    # **Eliminar secuencias de "__", "___", etc., dejando un solo "_"**
+    nombres_columnas = nombres_columnas.apply(lambda x: re.sub(r'_{2,}', '', x))
+
     return nombres_columnas
+
 
