@@ -11,15 +11,23 @@ import os
 import re
 import unicodedata
 
+import pandas as pd
+
 def eliminar_columnas_subtotales(dataframe):
-    # Lista de palabras clave a eliminar (sin importar mayúsculas o minúsculas)
+    # Lista de palabras clave a eliminar si están contenidas en el nombre de la columna
     palabras_clave = ["sub", "total", "subt"]
     
-    # Filtrar las columnas que NO contienen las palabras clave
-    columnas_filtradas = [col for col in dataframe.columns if not any(palabra.lower() in col.lower() for palabra in palabras_clave)]
+    # Filtrar las columnas:
+    # - Se eliminan si contienen alguna palabra clave (excepto "no")
+    # - Se eliminan si la columna es exactamente "No" (ignorando mayúsculas)
+    columnas_filtradas = [
+        col for col in dataframe.columns 
+        if not any(palabra.lower() in col.lower() for palabra in palabras_clave) and col.lower() != "no"
+    ]
     
     # Retornar el dataframe solo con las columnas permitidas
     return dataframe[columnas_filtradas]
+
 
 
 def reorganizar_datos(dataframe):
@@ -51,7 +59,7 @@ def reorganizar_datos(dataframe):
     df_long[nombres_columnas_creadas] = columnas_creadas
 
     # Convertir la columna "Datos" a entero
-    #df_long["Datos"] = pd.to_numeric(df_long["Datos"], errors="coerce")
+    df_long["Datos"] = df_long["Datos"].astype(str).str.replace(r"[\s,\.]", "", regex=True).str.extract(r"(\d+)").astype(float).astype("Int64")
 
     # Retornar el DataFrame reorganizado
     return df_long.drop(columns=["dividir"])
@@ -123,4 +131,57 @@ def anti_join(df1, df2, left_on, right_on):
     inner_join = pd.merge(df1, df2, left_on=left_on, right_on=right_on, how='inner')
     return df1[~df1[left_on].isin(inner_join[left_on])]
 
+
+def renombrar_columna(nombre_columna, dataframe, conjunto_valores):
+    """
+    Cambia el nombre de la primera columna cuyos valores únicos sean un subconjunto de un conjunto dado.
+
+    :param nombre_columna: Nuevo nombre para la columna que cumpla la condición.
+    :param dataframe: DataFrame de entrada.
+    :param conjunto_valores: Conjunto de valores que debe contener la columna.
+    :return: DataFrame con la columna renombrada (si aplica).
+    """
+    df = dataframe.copy()
     
+    for columna in df.columns:
+        if set(df[columna].dropna().unique()).issubset(conjunto_valores):
+            df = df.rename(columns={columna: nombre_columna})
+            break
+    
+    return df
+
+
+def renombrar_columnas(dataframe):
+    df = dataframe.copy()
+    sexo = {"H","M"}
+    print("ok")
+
+def generar_columnas(descripcion, columnas, dataframe):
+    """
+    Genera nuevas columnas en un DataFrame a partir de una cadena de texto y una tupla de nombres de columna.
+
+    :param descripcion: str - Cadena con el formato "palabra1_palabra2".
+    :param columnas: tuple - Tupla con los nombres de las nuevas columnas (columna_1, columna_2).
+    :param dataframe: pd.DataFrame - DataFrame al que se agregarán las nuevas columnas.
+    :return: pd.DataFrame - DataFrame con las nuevas columnas agregadas.
+    """
+    if not isinstance(descripcion, str) or "_" not in descripcion:
+        raise ValueError("La descripción debe ser un string en formato 'palabra1_palabra2'.")
+
+    if not isinstance(columnas, tuple) or len(columnas) != 2:
+        raise ValueError("Las columnas deben ser una tupla con exactamente dos elementos.")
+
+    palabra1, palabra2 = descripcion.split("_", 1)
+
+    # Agregar las nuevas columnas al DataFrame
+    dataframe[columnas[0]] = palabra1
+    dataframe[columnas[1]] = palabra2
+
+    return dataframe
+
+
+def coincidencia(patron, valor):
+    if re.search(patron, valor):
+        return True
+    else:
+        return False
