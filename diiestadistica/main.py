@@ -3,15 +3,12 @@
 
 import tkinter as tk
 from tkinter import ttk
-from .ventana_base import ventana_base, agregar_boton
-from .ventana_base import agregar_ciclo_box, limpiar_descargas, agregar_periodo_box
-from .ventana_base import estilizar_pestañas
-from .ventana_base import activar_descarga_intranet
-from .ventana_base import seleccionar_carpeta
-from .ventana_base import agregar_textbox
-from .ventana_base import boton_carpeta
-from .ventana_base import crear_directorio
-from .ventana_base import mover_archivos
+from diiestadistica.gui.ventana_base import ventana_base, agregar_boton
+from diiestadistica.gui.ventana_base import agregar_ciclo_box, limpiar_descargas, agregar_periodo_box
+from diiestadistica.gui.ventana_base import estilizar_pestañas
+from diiestadistica.gui.ventana_base import ventana_base, agregar_boton
+from diiestadistica.gui.ventana_base import activar_descarga_intranet
+
 
 def quitar():
     notebook.destroy()
@@ -36,10 +33,7 @@ def descargar(ciclos, periodos):
 def mapre():
     print("hostia tio ya esta generandose el mapre")
     quitar()
-
-def mover(seleccion_textbox,ciclos, periodos):
-    mover_archivos(seleccion_textbox,ciclos, periodos)
-
+    
 root = tk.Tk()
 root = ventana_base(root,"I N I C I O")
 
@@ -65,35 +59,23 @@ limpieza_limpiar = agregar_boton(frame_limpieza,"Limpiar")
 limpieza_limpiar.config(command=limpiar)
 notebook.add(frame_limpieza, text="Limpieza Descargas")
 
+# Pestaña Selección de carpeta
+frame_seleccion = ttk.Frame(notebook)
+seleccion_regresar = agregar_boton(frame_seleccion,"Regresar")
+seleccion_regresar.config(command=lambda: ir_a_pestaña_n(1))
+seleccion_limpiar = agregar_boton(frame_seleccion,"seleccionar")
+seleccion_limpiar.config(command=limpiar)
+notebook.add(frame_seleccion, text="Selección de carpeta")
+
 # Pestaña Ingreso de Datos
 frame_datos = ttk.Frame(notebook)
 ciclos = agregar_ciclo_box(frame_datos)
 periodos = agregar_periodo_box(frame_datos)
 datos_regresar = agregar_boton(frame_datos,"Regresar")
-datos_regresar.config(command=lambda: ir_a_pestaña_n(1))
+datos_regresar.config(command=lambda: ir_a_pestaña_n(2))
 datos_Confirmar = agregar_boton(frame_datos,"Confirmar Selección")
 datos_Confirmar.config(command=lambda: descargar(ciclos,periodos))
 notebook.add(frame_datos, text="Ingreso de Datos")
-
-
-# Pestaña Selección de carpeta
-frame_seleccion = ttk.Frame(notebook)
-seleccion_textbox = agregar_textbox(frame_seleccion)
-seleccion_seleccion = boton_carpeta(frame_seleccion)
-seleccion_seleccion.config(command=lambda: seleccionar_carpeta(seleccion_textbox))
-seleccion_aceptar = agregar_boton(frame_seleccion,"Aceptar")
-seleccion_aceptar.config(command=lambda: crear_directorio(seleccion_textbox,ciclos, periodos))
-seleccion_regresar = agregar_boton(frame_seleccion,"Regresar")
-seleccion_regresar.config(command=lambda: ir_a_pestaña_n(2))
-notebook.add(frame_seleccion, text="Selección de carpeta")
-
-# Pestaña Procesamiento de datos
-frame_procesamiento_crudo = ttk.Frame(notebook)
-crudo_regresar = agregar_boton(frame_procesamiento_crudo,"Regresar")
-crudo_regresar.config(command=lambda: ir_a_pestaña_n(3))
-crudo_Generar = agregar_boton(frame_procesamiento_crudo,"Procesar datos")
-crudo_Generar.config(command=lambda: mover(seleccion_textbox,ciclos, periodos))
-notebook.add(frame_procesamiento_crudo, text="Procesamiento")
 
 # Pestaña Procesamiento de Informes
 frame_procesamiento = ttk.Frame(notebook)

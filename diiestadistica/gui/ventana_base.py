@@ -5,32 +5,45 @@ from ..scraping.credenciales import credenciales
 from selenium import webdriver
 from tkinter.ttk import *
 from ..scraping.descarga_selenium import descarga_selenium
+
+from tkinter import filedialog
 import re
 import os
 import shutil
 import platform
 
+def ruta_descargas():
+    if platform.system() == "Windows":
+        if os.path.isdir(os.path.join(os.environ["USERPROFILE"], "Downloads")):
+            descarga_dir = os.path.join(os.environ["USERPROFILE"], "Downloads")
+            return descarga_dir
+        elif os.path.isdir(os.path.join(os.environ["USERPROFILE"], "Descargas")):
+            descarga_dir = os.path.join(os.environ["USERPROFILE"], "Descargas")
+            return descarga_dir
+        else:
+            return
+    else:
+        if os.path.isdir(os.path.join(os.path.expanduser("~"), "Downloads")):
+            descarga_dir = os.path.join(os.path.expanduser("~"), "Downloads")
+            return descarga_dir
+        elif os.path.isdir(os.path.join(os.path.expanduser("~"), "Descargas")):
+            descarga_dir = os.path.join(os.path.expanduser("~"), "Descargas")
+            return descarga_dir
+        else:
+            return
+
 def limpiar_descargas():
     # Detectar la carpeta de Descargas según el sistema operativo
-    if platform.system() == "Windows":
-        descarga_dir = os.path.join(os.environ["USERPROFILE"], "Downloads")
-    else:  # macOS y Linux
-        descarga_dir = os.path.join(os.path.expanduser("~"), "Downloads")
-
-    # Verificar si la carpeta existe
-    if not os.path.exists(descarga_dir):
-        print(f"La carpeta de Descargas no existe: {descarga_dir}")
-        return
-
+    descarga_dir = ruta_descargas()
     # Recorrer todos los archivos y carpetas en Descargas
     for item in os.listdir(descarga_dir):
         item_path = os.path.join(descarga_dir, item)
 
         try:
             if os.path.isfile(item_path) or os.path.islink(item_path):
-                os.remove(item_path)  # Eliminar archivos y enlaces
+                os.remove(item_path)
             elif os.path.isdir(item_path):
-                shutil.rmtree(item_path)  # Eliminar carpetas y su contenido
+                shutil.rmtree(item_path)
             print(f"Eliminado: {item_path}")
         except Exception as e:
             print(f"Error al eliminar {item_path}: {e}")
@@ -144,3 +157,113 @@ def estilizar_pestañas(notebook, bg_color="#5A1236", fg_color="white", padding=
     style.map("TNotebook.Tab",
               background=[("selected", "#75204D")],  # Color cuando está seleccionada
               foreground=[("selected", "white")])
+    
+def seleccionar_carpeta(entry):
+    carpeta = filedialog.askdirectory()
+    if carpeta:
+        entry.delete(0, tk.END)
+        entry.insert(0, carpeta)
+
+def agregar_textbox(frame):
+    entry_ruta = ttk.Entry(frame, width=50)
+    entry_ruta.pack(padx=5, pady=5, fill="x")
+    return entry_ruta
+
+def boton_carpeta(frame):
+    boton_carpeta = ttk.Button(
+        frame, text="📁")
+    boton_carpeta.pack(pady=10)
+    return boton_carpeta
+
+import os
+
+def crear_directorio(directory_paths, ciclos, periodos):
+    """
+    Crea la estructura de carpetas necesaria para un ciclo y periodo específico.
+
+    :param directory_path: Ruta base donde se crearán los directorios.
+    :param ciclo: Ciclo académico (ej. "2024-2025").
+    :param periodo: Periodo académico (ej. "01").
+    """
+    directory_path = directory_paths.get()
+    ciclo = ciclos.get()
+    periodo = periodos.get()
+    ruta_periodo = os.path.join(directory_path, f"periodo_{ciclo}_{periodo}")
+    
+    # Lista de subdirectorios dentro del periodo
+    subdirectorios = [
+        "archivos_originales",
+        "archivos_aplanados",
+        "reportes",
+        "archivos_homologados",
+        "subtotales"
+    ]
+
+    try:
+        # Crear la carpeta del periodo y sus subdirectorios
+        os.makedirs(ruta_periodo, exist_ok=True)
+        
+        for sub in subdirectorios:
+            os.makedirs(os.path.join(ruta_periodo, sub), exist_ok=True)
+
+        print(f"Directorios creados exitosamente en '{ruta_periodo}'.")
+
+    except Exception as e:
+        print(f"❌ Error al crear la estructura de directorios: {e}")
+
+
+def mover_archivos(destinos,ciclos, periodos):
+    destino = destinos.get()
+    ciclo = ciclos.get()
+    periodo = periodos.get()
+    # Definir la ruta de la carpeta de "Descargas"
+    path_descargas = ruta_descargas()
+    destino_final = f"{destino}/periodo_{ciclo}_{periodo}/archivos_originales"
+    # Verificar si la ruta de destino es válida
+    if not os.path.exists(destino_final):
+        print(f"La ruta de destino no existe: {destino_final}")
+        return
+    
+    # Verificar si la carpeta de "Descargas" existe
+    if not os.path.exists(path_descargas):
+        print(f"La carpeta de 'Descargas' no existe: {path_descargas}")
+        return
+
+    # Obtener una lista de todos los archivos en la carpeta de "Descargas"
+    archivos = os.listdir(path_descargas)
+
+    # Mover cada archivo a la carpeta de destino final
+    for archivo in archivos:
+        ruta_origen = os.path.join(path_descargas, archivo)
+        if os.path.isfile(ruta_origen):
+            try:
+                shutil.move(ruta_origen, destino_final)
+                print(f"Archivo movido: {archivo}")
+            except Exception as e:
+                print(f"No se pudo mover el archivo {archivo}: {e}")
+
+
+
+
+def ejecutar_funciones(frame, labels, funciones, idx=0):
+    """
+    Ejecuta funciones en orden, esperando que cada una termine antes de continuar con la siguiente.
+
+    :param frame: ttk.Frame donde están los labels.
+    :param labels: Lista de labels donde se mostrarán los resultados (✅ o ❌).
+    :param funciones: Lista de funciones a ejecutar.
+    :param idx: Índice de la función actual (para llamadas recursivas).
+    """
+    if idx >= len(funciones):
+        return
+
+    try:
+        funciones[idx]()
+        labels[idx].config(text="✅", fg="green")
+    except Exception as e:
+        labels[idx].config(text="❌", fg="red")
+        print(f"Error en la función {idx + 1}: {e}")
+
+    # Llamar a la siguiente función después de terminar
+    frame.after(100, lambda: ejecutar_funciones(frame, labels, funciones, idx + 1))
+

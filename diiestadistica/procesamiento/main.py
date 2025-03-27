@@ -15,9 +15,12 @@ import os
 import re
 
 
-if __name__ == "__main__":
-	ruta_carpeta = seleccionar_carpeta()
-	for nombre_archivo in os.listdir(ruta_carpeta):
+def procesamiento_aplanamiento(ruta_carpeta,ciclo,periodo):
+	ruta_periodo = f"{ruta_carpeta}/periodo_{ciclo}_{periodo}"
+	ruta_xml = f"{ruta_periodo}/archivos_originales"
+	ruta_aplanada = f"{ruta_periodo}/archivos_originales"
+
+	for nombre_archivo in os.listdir(ruta_xml):
 		try:
 			if nombre_archivo.endswith("xls"):
 				ruta_archivo = f"{ruta_carpeta}/{nombre_archivo}"
