@@ -52,7 +52,7 @@ def limpiar_descargas():
 
 def ventana_base(nueva_ventana,titulo="M A P R E"):
     nueva_ventana.title(titulo)
-    nueva_ventana.geometry("800x533")
+    nueva_ventana.geometry("900x400")
     color_fondo = "#5A1236"
     nueva_ventana.configure(bg=color_fondo)
     return nueva_ventana
@@ -175,95 +175,7 @@ def boton_carpeta(frame):
     boton_carpeta.pack(pady=10)
     return boton_carpeta
 
-import os
-
-def crear_directorio(directory_paths, ciclos, periodos):
-    """
-    Crea la estructura de carpetas necesaria para un ciclo y periodo específico.
-
-    :param directory_path: Ruta base donde se crearán los directorios.
-    :param ciclo: Ciclo académico (ej. "2024-2025").
-    :param periodo: Periodo académico (ej. "01").
-    """
-    directory_path = directory_paths.get()
-    ciclo = ciclos.get()
-    periodo = periodos.get()
-    ruta_periodo = os.path.join(directory_path, f"periodo_{ciclo}_{periodo}")
-    
-    # Lista de subdirectorios dentro del periodo
-    subdirectorios = [
-        "archivos_originales",
-        "archivos_aplanados",
-        "reportes",
-        "archivos_homologados",
-        "subtotales"
-    ]
-
-    try:
-        # Crear la carpeta del periodo y sus subdirectorios
-        os.makedirs(ruta_periodo, exist_ok=True)
-        
-        for sub in subdirectorios:
-            os.makedirs(os.path.join(ruta_periodo, sub), exist_ok=True)
-
-        print(f"Directorios creados exitosamente en '{ruta_periodo}'.")
-
-    except Exception as e:
-        print(f"❌ Error al crear la estructura de directorios: {e}")
-
-
-def mover_archivos(destinos,ciclos, periodos):
-    destino = destinos.get()
-    ciclo = ciclos.get()
-    periodo = periodos.get()
-    # Definir la ruta de la carpeta de "Descargas"
-    path_descargas = ruta_descargas()
-    destino_final = f"{destino}/periodo_{ciclo}_{periodo}/archivos_originales"
-    # Verificar si la ruta de destino es válida
-    if not os.path.exists(destino_final):
-        print(f"La ruta de destino no existe: {destino_final}")
-        return
-    
-    # Verificar si la carpeta de "Descargas" existe
-    if not os.path.exists(path_descargas):
-        print(f"La carpeta de 'Descargas' no existe: {path_descargas}")
-        return
-
-    # Obtener una lista de todos los archivos en la carpeta de "Descargas"
-    archivos = os.listdir(path_descargas)
-
-    # Mover cada archivo a la carpeta de destino final
-    for archivo in archivos:
-        ruta_origen = os.path.join(path_descargas, archivo)
-        if os.path.isfile(ruta_origen):
-            try:
-                shutil.move(ruta_origen, destino_final)
-                print(f"Archivo movido: {archivo}")
-            except Exception as e:
-                print(f"No se pudo mover el archivo {archivo}: {e}")
 
 
 
-
-def ejecutar_funciones(frame, labels, funciones, idx=0):
-    """
-    Ejecuta funciones en orden, esperando que cada una termine antes de continuar con la siguiente.
-
-    :param frame: ttk.Frame donde están los labels.
-    :param labels: Lista de labels donde se mostrarán los resultados (✅ o ❌).
-    :param funciones: Lista de funciones a ejecutar.
-    :param idx: Índice de la función actual (para llamadas recursivas).
-    """
-    if idx >= len(funciones):
-        return
-
-    try:
-        funciones[idx]()
-        labels[idx].config(text="✅", fg="green")
-    except Exception as e:
-        labels[idx].config(text="❌", fg="red")
-        print(f"Error en la función {idx + 1}: {e}")
-
-    # Llamar a la siguiente función después de terminar
-    frame.after(100, lambda: ejecutar_funciones(frame, labels, funciones, idx + 1))
 

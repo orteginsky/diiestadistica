@@ -1,15 +1,42 @@
 from .seleccionar_carpeta import seleccionar_carpeta
 import os
+import pandas as pd
 
-
-def renombrar_archivos(ruta_carpeta, diccionario_nombres):
+def renombrar_archivos(ruta_carpeta, bolean=False):
     """
     Renombra los archivos en la carpeta dada según el diccionario de nombres.
 
     :param ruta_carpeta: str - Ruta de la carpeta que contiene los archivos.
     :param diccionario_nombres: dict - Diccionario con los nombres actuales como claves y los nuevos nombres como valores.
     """
-	
+
+    diccionario_nombres = {
+	"Concentrado_Matricula_Inscrita.xls":"NMS_Basica.xls",
+	"Concentrado_Poblacion_Atendida_Mod_Escolariza_Superior.xls":"NS_Basica.xls",
+	"Concentrado_Poblacion_Atendida.xls":"NP_Basica.xls",
+	"Concentrado.xls": "NMS_Aprovechamiento.xls",
+	"Concentrado (1).xls": "NS_Aprovechamiento.xls",
+	"Concentrado_Matricula_Inscrita_ProgramaAcademico_Semestre_Sexo (1).xls":"NMS_Turno.xls",
+	"Concentrado_Matricula_Inscrita_ProgramaAcademico_Semestre_Sexo (3).xls":"NS_Turno.xls",
+	"Concentrado_Matricula_Inscrita_ProgramaAcademico_Semestre_Sexo (4).xls":"NP_Turno.xls",
+	"Concentrado_Matricula_Inscrita_ProgramaAcademico_Semestre_Sexo.xls":"NMS_Semestre.xls",
+	"Concentrado_Matricula_Inscrita_ProgramaAcademico_Semestre_Sexo (2).xls":"NS_Semestre.xls",
+	"Concentrado_Poblacion_Atendida__Matricula_Inscrita_ProgramaAcademico_Semestre_Sexo.xls":"NP_Semestre.xls",
+	"Concentrado_Matricula_Por_Grupos_Edad_NMS.xls":"NMS_Grupos.xls",
+	"Concentrado_Matricula_Por_Grupos_Edad_NMS (1).xls":"NS_Grupos.xls",
+	"Concentrado_Matricula_Por_Grupos_Edad_NMS (2).xls":"NP_Grupos.xls",
+	"ConcentradoEgresadosMedioSuperior.xls":"NMS_Egresados.xls",
+	"ConcentradoEgresadosMedioSuperior (1).xls":"NS_Egresados.xls",
+	"ConcentradoEgresadosPostgrado.xls":"NP_Egresados.xls",
+	"ConcentradoTitulacion.xls":"NMS_Titulados.xls",
+	"ConcentradoTitulacion (1).xls":"NS_Titulados.xls",
+	"ConcentradoGraduadosPostgrado.xls":"NP_Titulados.xls"
+	}
+
+    if bolean:
+        ruta_carpeta = f"{ruta_carpeta}/archivos_originales"
+
+
     if not os.path.isdir(ruta_carpeta):
         print(f"Error: La ruta '{ruta_carpeta}' no es una carpeta válida.")
         return
@@ -33,8 +60,6 @@ def renombrar_archivos(ruta_carpeta, diccionario_nombres):
         else:
             print(f"Sin cambio: '{archivo}' no está en el diccionario.")
 
-
-import pandas as pd
 
 def generar_columnas(descripcion, columnas, dataframe):
     """
@@ -62,27 +87,5 @@ def generar_columnas(descripcion, columnas, dataframe):
 
 
 if __name__=="__main__":
-    diccionario_nombres = {
-	"Concentrado_Matricula_Inscrita.xls":"NMS_Basica.xls",
-	"Concentrado_Poblacion_Atendida_Mod_Escolariza_Superior.xls":"NS_Basica.xls",
-	"Concentrado_Poblacion_Atendida.xls":"NP_Basica.xls",
-	"Concentrado.xls": "NMS_Aprovechamiento.xls",
-	"Concentrado (1).xls": "NS_Aprovechamiento.xls",
-	"Concentrado_Matricula_Inscrita_ProgramaAcademico_Semestre_Sexo (1).xls":"NMS_Turno.xls",
-	"Concentrado_Matricula_Inscrita_ProgramaAcademico_Semestre_Sexo (3).xls":"NS_Turno.xls",
-	"Concentrado_Matricula_Inscrita_ProgramaAcademico_Semestre_Sexo (4).xls":"NP_Turno.xls",
-	"Concentrado_Matricula_Inscrita_ProgramaAcademico_Semestre_Sexo.xls":"NMS_Semestre.xls",
-	"Concentrado_Matricula_Inscrita_ProgramaAcademico_Semestre_Sexo (2).xls":"NS_Semestre.xls",
-	"Concentrado_Poblacion_Atendida__Matricula_Inscrita_ProgramaAcademico_Semestre_Sexo.xls":"NP_Semestre.xls",
-	"Concentrado_Matricula_Por_Grupos_Edad_NMS.xls":"NMS_Grupos.xls",
-	"Concentrado_Matricula_Por_Grupos_Edad_NMS (1).xls":"NS_Grupos.xls",
-	"Concentrado_Matricula_Por_Grupos_Edad_NMS (2).xls":"NP_Grupos.xls",
-	"ConcentradoEgresadosMedioSuperior.xls":"NMS_Egresados.xls",
-	"ConcentradoEgresadosMedioSuperior (1).xls":"NS_Egresados.xls",
-	"ConcentradoEgresadosPostgrado.xls":"NP_Egresados.xls",
-	"ConcentradoTitulacion.xls":"NMS_Titulados.xls",
-	"ConcentradoTitulacion (1).xls":"NS_Titulados.xls",
-	"ConcentradoGraduadosPostgrado.xls":"NP_Titulados.xls"
-	}
     ruta = seleccionar_carpeta()
-    renombrar_archivos(ruta, diccionario_nombres)
+    renombrar_archivos(ruta)
