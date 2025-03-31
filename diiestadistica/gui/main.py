@@ -70,10 +70,11 @@ def crear_directorio_gui(seleccion_textbox, ciclos, periodos, pestaña):
 def renombrar_archivos_gui(seleccion_textbox, ciclos, periodos, boolean= True):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
     renombrar_archivos(ruta_base, boolean)
+
 def mover_archivos_gui(seleccion_textbox, ciclos, periodos, boolean= True):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
     mover_archivos(ruta_base, boolean)
-
+    
 def depurar_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
     procesamiento_aplanamiento(ruta_base)
@@ -205,8 +206,8 @@ for i, label in enumerate(labels_definidos):
 
 
 funciones = [
-    (renombrar_archivos_gui,[seleccion_textbox, ciclos, periodos, True]),
     (mover_archivos_gui,[seleccion_textbox, ciclos, periodos, True]),
+    (renombrar_archivos_gui,[seleccion_textbox, ciclos, periodos, True]),
     (depurar_gui,[seleccion_textbox, ciclos, periodos]),
     (homologar_gui,[seleccion_textbox, ciclos, periodos, True])
     ]

@@ -80,7 +80,7 @@ def correccion_conceptos(dataframe):
             "^Muj$": "Mujeres"
         }, regex=True)
 
-    if "Turno" in dataframe.columns:
+    if "Concepto" in dataframe.columns:
         dataframe = dataframe[~dataframe["Turno"].str.contains("Subt", na=False)]
         dataframe["Turno"] = dataframe["Turno"].replace({
             "^V$": "Vespertino",
@@ -89,12 +89,8 @@ def correccion_conceptos(dataframe):
             "^Mix$": "Mixto",
             "^Mat$": "Matutino"
         }, regex=True)
-
-    if "Concepto" in dataframe.columns:
         dataframe["Concepto"] = dataframe["Concepto"].replace({
             "^Primer Ingreso$": "Nuevo Ingreso"
         }, regex=True)
-    
+        
     return dataframe
-
-

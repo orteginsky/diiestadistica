@@ -155,29 +155,6 @@ def generar_columnas(descripcion, columnas, dataframe):
 
     return dataframe
 
-def generar_columnas(descripcion, columnas, dataframe):
-    """
-    Genera nuevas columnas en un DataFrame a partir de una cadena de texto y una tupla de nombres de columna.
-
-    :param descripcion: str - Cadena con el formato "palabra1_palabra2".
-    :param columnas: tuple - Tupla con los nombres de las nuevas columnas (columna_1, columna_2).
-    :param dataframe: pd.DataFrame - DataFrame al que se agregarán las nuevas columnas.
-    :return: pd.DataFrame - DataFrame con las nuevas columnas agregadas.
-    """
-    if not isinstance(descripcion, str) or "_" not in descripcion:
-        raise ValueError("La descripción debe ser un string en formato 'palabra1_palabra2'.")
-
-    if not isinstance(columnas, tuple) or len(columnas) != 2:
-        raise ValueError("Las columnas deben ser una tupla con exactamente dos elementos.")
-
-    palabra1, palabra2 = descripcion.split("_", 1)
-
-    # Agregar las nuevas columnas al DataFrame
-    dataframe[columnas[0]] = palabra1
-    dataframe[columnas[1]] = palabra2
-
-    return dataframe
-
 
 
 def dividir_subtotales(dataframe):
@@ -224,3 +201,26 @@ def eliminar_sin_afectar(df, columnas_excluir, columna_numerica='Datos'):
 
     return df_agrupado
 
+def eliminar_ceros(dataframe):
+    if "Datos" in dataframe.columns:
+        
+        if "Sexo" in dataframe.columns:
+            left_on = [col for col in dataframe.columns if col not in ['Sexo','Datos']]
+            right_on = left_on
+            ceros = eliminar_sin_afectar(dataframe, ["Sexo"], "Datos")
+            ceros = ceros[ceros['Datos']==0]
+            inner_join = pd.merge(dataframe, ceros, left_on=left_on, right_on=right_on, how='inner')
+            sin_ceros = dataframe[~dataframe[left_on].isin(inner_join[left_on])]
+            return sin_ceros
+        elif "Concepto" in dataframe.columns:
+            left_on = [col for col in dataframe.columns if col not in ['Concepto','Datos']]
+            right_on = left_on
+            ceros = eliminar_sin_afectar(dataframe, ["Concepto"], "Datos")
+            ceros = ceros[ceros['Datos']==0]
+            inner_join = pd.merge(dataframe, ceros, left_on=left_on, right_on=right_on, how='inner')
+            sin_ceros = dataframe[~dataframe[left_on].isin(inner_join[left_on])]
+            return sin_ceros
+        else:
+            return dataframe
+    else:
+        return dataframe

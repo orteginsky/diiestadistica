@@ -9,10 +9,14 @@ from .transformaciones import eliminar_columnas_subtotales
 from .transformaciones import reorganizar_datos
 from .transformaciones import generar_columnas
 from .transformaciones import dividir_subtotales
+from .transformaciones import eliminar_ceros
+from .transformaciones import eliminar_sin_afectar
+from .limpieza import correccion_conceptos
 
 #funciones particulares
 from bs4 import BeautifulSoup
 #librerias
+import pandas as pd
 import os
 import re
 
@@ -34,21 +38,25 @@ def procesamiento_aplanamiento(ruta_periodo):
 					print("Tabla dentro de otro tabla")
 				else:
 					datos_html = soup.find("tbody")
+				
 				datos_html = limpiar_html(datos_html)
 				datos_matriz = procesar_tabla_html(soup=datos_html)
 				datos_exp = expandir_tabla(datos_matriz)
 				datos_exp.columns = definir_encabezados(encabezados_df)
+				
 				if re.search('Egresados',nombre_archivo):
 					datos_exp = reorganizar_datos(datos_exp)
 					datos_exp.rename(columns={'col_2':'Sexo'}, inplace= True)
 				else:
 					datos_exp = eliminar_columnas_subtotales(datos_exp)
 					datos_exp = reorganizar_datos(datos_exp)
+				
 				datos_exp = datos_exp.loc[:,datos_exp.nunique()>1]
 				nombre_archivo_guardar = re.sub('.xls','',nombre_archivo)
 				columnas = ("Nivel","Indice")
 				datos_exp = generar_columnas(descripcion=nombre_archivo_guardar, columnas=columnas, dataframe=datos_exp)
 				datos_exp = eliminar_columnas_subtotales(datos_exp)
+
 				if coincidencia('Turno',nombre_archivo) or \
 					  coincidencia('NMS_Titulados',nombre_archivo) or \
 						  coincidencia('NS_Titulados',nombre_archivo) or \
@@ -73,5 +81,74 @@ def procesamiento_aplanamiento(ruta_periodo):
 				datos_exp.to_excel(ruta_guardar, index=False)
 				ruta_guardar_subtotales = f"{ruta_subtotales}/{nombre_archivo_guardar}.xlsx"
 				subtotales.to_excel(ruta_guardar_subtotales, index=False)
+				
+		except:
+			print(nombre_archivo)
+
+def procesamiento_limpieza(ruta_periodo):
+	ruta_aplanada = f"{ruta_periodo}/archivos_aplanados"
+	ruta_homo = f"{ruta_periodo}/archivos_homologados"
+	for nombre_archivo in os.listdir(ruta_aplanada):
+		try:
+			if nombre_archivo.endswith("xlsx"):
+				nombre_archivo_guardar = re.sub('.xlsx','',nombre_archivo)
+				ruta_archivo = f"{ruta_aplanada}/{nombre_archivo}"
+				dataframe = pd.read_excel(ruta_archivo)
+				dataframe = eliminar_ceros(dataframe)
+				#dataframe = correccion_conceptos(dataframe)
+				ruta_homo_guardar = f"{ruta_homo}/{nombre_archivo_guardar}.xlsx"
+				dataframe.to_excel(ruta_homo_guardar)
+		except:
+			print(nombre_archivo)
+
+def procesamiento_limpieza(ruta_periodo):
+	ruta_aplanada = f"{ruta_periodo}/archivos_aplanados"
+	ruta_homo = f"{ruta_periodo}/archivos_homologados"
+	for nombre_archivo in os.listdir(ruta_aplanada):
+		try:
+			if nombre_archivo.endswith("xlsx"):
+				nombre_archivo_guardar = re.sub('.xlsx','',nombre_archivo)
+				ruta_archivo = f"{ruta_aplanada}/{nombre_archivo}"
+				dataframe = pd.read_excel(ruta_archivo)
+				if "Sexo" in dataframe.columns:
+					left_on = [col for col in dataframe.columns if col not in ['Sexo','Datos']]
+					columnas_agrupacion = [col for col in dataframe.columns if col not in ['Sexo','Datos']]
+					ceros = dataframe.groupby(columnas_agrupacion, as_index=False)['Datos'].sum()
+					ceros = ceros[ceros['Datos']==0]
+					sin_ceros = dataframe.merge(ceros[left_on], on=left_on, how='left', indicator=True)
+					dataframe = sin_ceros[sin_ceros['_merge'] == 'left_only'].drop(columns=['_merge'])
+					dataframe = dataframe[~dataframe["Sexo"].str.contains("Subt", na=False)]
+					dataframe["Sexo"] = dataframe["Sexo"].replace({
+						"^H$": "Hombres",
+						"^M$": "Mujeres",
+						"^Hom$": "Hombres",
+						"^Muj$": "Mujeres"
+					}, regex=True)
+					dataframe = dataframe[dataframe['Sexo']!='H..M']
+				elif "Concepto" in dataframe.columns:
+					left_on = [col for col in dataframe.columns if col not in ['Concepto','Datos']]
+					columnas_agrupacion = [col for col in dataframe.columns if col not in ['Concepto','Datos']]
+					ceros = dataframe.groupby(columnas_agrupacion, as_index=False)['Datos'].sum()
+					ceros = ceros[ceros['Datos']==0]
+					sin_ceros = dataframe.merge(ceros[left_on], on=left_on, how='left', indicator=True)
+					dataframe = sin_ceros[sin_ceros['_merge'] == 'left_only'].drop(columns=['_merge'])
+				else:
+					print("valio")
+					return
+
+				if "Concepto" in dataframe.columns:
+					dataframe["Concepto"] = dataframe["Concepto"].astype(str)
+					dataframe = dataframe[~dataframe["Concepto"].str.contains("Subt", na=False)]
+					dataframe["Concepto"] = dataframe["Concepto"].replace({
+						"^V$": "Vespertino",
+						"^M$": "Matutino",
+						"^Ves$": "Vespertino",
+						"^Mix$": "Mixto",
+						"^Mat$": "Matutino",
+						"^Primer Ingreso$": "Nuevo Ingreso",
+						"." : " "
+					}, regex=True)
+				ruta_homo_guardar = f"{ruta_homo}/{nombre_archivo_guardar}.xlsx"
+				dataframe.to_excel(ruta_homo_guardar, index=False)
 		except:
 			print(nombre_archivo)
