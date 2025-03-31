@@ -1,54 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
 from datetime import datetime
-from ..scraping.credenciales import credenciales
-from selenium import webdriver
 from tkinter.ttk import *
 from ..scraping.descarga_selenium import descarga_selenium
 
 from tkinter import filedialog
 import re
-import os
-import shutil
-import platform
-
-def ruta_descargas():
-    if platform.system() == "Windows":
-        if os.path.isdir(os.path.join(os.environ["USERPROFILE"], "Downloads")):
-            descarga_dir = os.path.join(os.environ["USERPROFILE"], "Downloads")
-            return descarga_dir
-        elif os.path.isdir(os.path.join(os.environ["USERPROFILE"], "Descargas")):
-            descarga_dir = os.path.join(os.environ["USERPROFILE"], "Descargas")
-            return descarga_dir
-        else:
-            return
-    else:
-        if os.path.isdir(os.path.join(os.path.expanduser("~"), "Downloads")):
-            descarga_dir = os.path.join(os.path.expanduser("~"), "Downloads")
-            return descarga_dir
-        elif os.path.isdir(os.path.join(os.path.expanduser("~"), "Descargas")):
-            descarga_dir = os.path.join(os.path.expanduser("~"), "Descargas")
-            return descarga_dir
-        else:
-            return
-
-def limpiar_descargas():
-    # Detectar la carpeta de Descargas según el sistema operativo
-    descarga_dir = ruta_descargas()
-    # Recorrer todos los archivos y carpetas en Descargas
-    for item in os.listdir(descarga_dir):
-        item_path = os.path.join(descarga_dir, item)
-
-        try:
-            if os.path.isfile(item_path) or os.path.islink(item_path):
-                os.remove(item_path)
-            elif os.path.isdir(item_path):
-                shutil.rmtree(item_path)
-            print(f"Eliminado: {item_path}")
-        except Exception as e:
-            print(f"Error al eliminar {item_path}: {e}")
-
-    print("Carpeta de Descargas limpiada correctamente.")
 
 def ventana_base(nueva_ventana,titulo="M A P R E"):
     nueva_ventana.title(titulo)
@@ -107,10 +64,9 @@ def activar_descarga_intranet(ciclo,periodo):
             anio_inicio = int(anio_coincidencia.group())
             semestre_inicio = int(periodo_coincidencia.group())
             if (anio_inicio!=anio_actual or (mes_actual>=8 and semestre_inicio==1 and anio_inicio==anio_actual)):
-                print("todo bien")
                 descarga_selenium(anio_inicio,semestre_inicio)
             else:
-                print("Nada bien")
+                print("No esta disponible aun la información")
                 return
         else:
             return            

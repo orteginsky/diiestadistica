@@ -1,6 +1,28 @@
-from .seleccionar_carpeta import seleccionar_carpeta
+from ..gui.seleccion_archivos import seleccionar_carpeta
+
 import os
-import pandas as pd
+
+def cambiar_extencion_carpeta(old_extension = "xls", new_extension = "html"):
+    carpeta = seleccionar_carpeta()
+    print(f'haz camiado los archivos con extension: {old_extension} por la extension {new_extension}')
+    for name_file in os.listdir(carpeta):
+        if name_file.endswith(old_extension):
+            root_file = f"{carpeta}/{name_file}"
+            cambiar_extencion_archivo(root_file,new_extension)
+        else:
+            print('archivo conservado')
+
+
+def cambiar_extencion_archivo(root_file,extension):
+    only_name,_ = os.path.splitext(root_file)
+    new_name = f"{only_name}" + "."+ f"{extension}"
+    os.rename(root_file, new_name)
+    #print(f"se ha cambiado la extencion tio del archivo {root_file} a la extension {extension} \n")
+    #print(f"{new_name}")
+    return new_name
+if __name__=='__main__':
+    cambiar_extencion_carpeta()
+
 
 def renombrar_archivos(ruta_carpeta, bolean=False):
     """
@@ -61,31 +83,3 @@ def renombrar_archivos(ruta_carpeta, bolean=False):
             print(f"Sin cambio: '{archivo}' no está en el diccionario.")
 
 
-def generar_columnas(descripcion, columnas, dataframe):
-    """
-    Genera nuevas columnas en un DataFrame a partir de una cadena de texto y una tupla de nombres de columna.
-
-    :param descripcion: str - Cadena con el formato "palabra1_palabra2".
-    :param columnas: tuple - Tupla con los nombres de las nuevas columnas (columna_1, columna_2).
-    :param dataframe: pd.DataFrame - DataFrame al que se agregarán las nuevas columnas.
-    :return: pd.DataFrame - DataFrame con las nuevas columnas agregadas.
-    """
-    if not isinstance(descripcion, str) or "_" not in descripcion:
-        raise ValueError("La descripción debe ser un string en formato 'palabra1_palabra2'.")
-
-    if not isinstance(columnas, tuple) or len(columnas) != 2:
-        raise ValueError("Las columnas deben ser una tupla con exactamente dos elementos.")
-
-    palabra1, palabra2 = descripcion.split("_", 1)
-
-    # Agregar las nuevas columnas al DataFrame
-    dataframe[columnas[0]] = palabra1
-    dataframe[columnas[1]] = palabra2
-
-    return dataframe
-
-
-
-if __name__=="__main__":
-    ruta = seleccionar_carpeta()
-    renombrar_archivos(ruta)

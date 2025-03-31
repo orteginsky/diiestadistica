@@ -1,5 +1,5 @@
+from ..utils.coincidencia import uno
 from bs4 import BeautifulSoup
-
 
 def limpiar_html(soup):
     # Paso 1: Eliminar las tablas anidadas en <tr> y mover su contenido
@@ -69,27 +69,8 @@ def procesar_tabla_html(soup):
     
     return lista_matrices
 
-def procesar_tabla_html_recursive(soup):
-    lista_matrices = []
-    filas = soup.find_all("tr", recursive = True)
-    for fila in filas:
-        celdas = fila.find_all(["td", "th"])
-        matriz_interada = []
-        for celda in celdas:
-            rowspan = int(celda.get("rowspan", 1))
-            colspan = int(celda.get("colspan", 1))
-            valor = celda.get_text().strip().replace("\n", "").replace("\t", "")
-            matriz_interada.append([rowspan, colspan,valor])
-            
-        lista_matrices.append(matriz_interada)
-    
-    return lista_matrices
 
-def uno(n):
-    if isinstance(n,int) and n>0:
-        return 1
-    else:
-        return 0
+
 
 def validar_rectangulo(matriz):
     k = len(matriz)

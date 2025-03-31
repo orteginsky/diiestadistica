@@ -1,11 +1,10 @@
-#from tkinter import Tk, Label, Button, ttk
-#import subprocess
+from ..utils.archivo_utils import renombrar_archivos
+from ..utils.os_utils import limpiar_descargas
+from ..utils.os_utils import crear_directorio
+from ..utils.os_utils import mover_archivos
 
-import tkinter as tk
-from tkinter import ttk
 from .ventana_base import ventana_base
 from .ventana_base import agregar_boton
-from .ventana_base import limpiar_descargas
 from .ventana_base import agregar_periodo_box
 from .ventana_base import agregar_ciclo_box
 from .ventana_base import estilizar_pestañas
@@ -13,10 +12,9 @@ from .ventana_base import activar_descarga_intranet
 from .ventana_base import seleccionar_carpeta
 from .ventana_base import agregar_textbox
 from .ventana_base import boton_carpeta
-from ..procesamiento.nombrar import renombrar_archivos
-import shutil
-import os
-import platform
+
+import tkinter as tk
+from tkinter import ttk
 
 def quitar():
     notebook.destroy()
@@ -42,6 +40,46 @@ def mapre():
     print("hostia tio ya esta generandose el mapre")
     quitar()
 
+def generar_ruta(seleccion_textbox, ciclos, periodos):
+    carpeta = seleccion_textbox.get()
+    ciclo = ciclos.get()
+    periodo = periodos.get()
+    ruta_base = f"{carpeta}/periodo_{ciclo}_{periodo}"
+    print(ruta_base)
+    return ruta_base
+
+
+def depurar(ruta_base, bolean = False):
+    if bolean:
+        print(f"se depuro en{ruta_base}")
+    else:
+        print("se depuro")
+
+def homologar(ruta_base, bolean = False):
+    if bolean:
+        print(f"se homologo en{ruta_base}")
+    else:
+        print("se homologo")
+
+def crear_directorio_gui(seleccion_textbox, ciclos, periodos, pestaña):
+    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    crear_directorio(ruta_base)
+    ir_a_pestaña_n(pestaña)
+
+def renombrar_archivos_gui(seleccion_textbox, ciclos, periodos, boolean= True):
+    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    renombrar_archivos(ruta_base, boolean)
+def mover_archivos_gui(seleccion_textbox, ciclos, periodos, boolean= True):
+    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    mover_archivos(ruta_base, boolean)
+
+def depurar_gui(seleccion_textbox, ciclos, periodos, boolean= True):
+    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    depurar(ruta_base, boolean)
+
+def homologar_gui(seleccion_textbox, ciclos, periodos, boolean= True):
+    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    homologar(ruta_base, boolean)
 
 def ejecutar_funciones(frame, labels, funciones, idx=0):
     """
@@ -65,106 +103,6 @@ def ejecutar_funciones(frame, labels, funciones, idx=0):
     # Llamar a la siguiente función después de terminar
     frame.after(100, lambda: ejecutar_funciones(frame, labels, funciones, idx + 1))
 
-def generar_ruta(seleccion_textbox, ciclos, periodos):
-    carpeta = seleccion_textbox.get()
-    ciclo = ciclos.get()
-    periodo = periodos.get()
-    ruta_base = f"{carpeta}/periodo_{ciclo}_{periodo}"
-    print(ruta_base)
-    return ruta_base
-
-def depurar(ruta_base, bolean = False):
-    if bolean:
-        print(f"se depuro en{ruta_base}")
-    else:
-        print("se depuro")
-
-def homologar(ruta_base, bolean = False):
-    if bolean:
-        print(f"se homologo en{ruta_base}")
-    else:
-        print("se homologo")
-
-def ruta_descargas():
-    if platform.system() == "Windows":
-        if os.path.isdir(os.path.join(os.environ["USERPROFILE"], "Downloads")):
-            descarga_dir = os.path.join(os.environ["USERPROFILE"], "Downloads")
-            return descarga_dir
-        elif os.path.isdir(os.path.join(os.environ["USERPROFILE"], "Descargas")):
-            descarga_dir = os.path.join(os.environ["USERPROFILE"], "Descargas")
-            return descarga_dir
-        else:
-            return
-    else:
-        if os.path.isdir(os.path.join(os.path.expanduser("~"), "Downloads")):
-            descarga_dir = os.path.join(os.path.expanduser("~"), "Downloads")
-            return descarga_dir
-        elif os.path.isdir(os.path.join(os.path.expanduser("~"), "Descargas")):
-            descarga_dir = os.path.join(os.path.expanduser("~"), "Descargas")
-            return descarga_dir
-        else:
-            return
-
-def crear_directorio(ruta_base):
-    """
-    Crea la estructura de carpetas necesaria para un ciclo y periodo específico.
-
-    """
-    
-    # Lista de subdirectorios dentro del periodo
-    subdirectorios = [
-        "archivos_originales",
-        "archivos_aplanados",
-        "reportes",
-        "archivos_homologados",
-        "subtotales"
-    ]
-
-    try:
-        # Crear la carpeta del periodo y sus subdirectorios
-        os.makedirs(ruta_base, exist_ok=True)
-        
-        for sub in subdirectorios:
-            os.makedirs(os.path.join(ruta_base, sub), exist_ok=True)
-
-        print(f"Directorios creados exitosamente en '{ruta_base}'.")
-
-    except Exception as e:
-        print(f"❌ Error al crear la estructura de directorios: {e}")
-
-
-def mover_archivos(ruta_base, bolean = False):
-
-    if bolean:
-        destino_final = f"{ruta_base}/archivos_originales"
-    else:
-        destino_final = ruta_base
-
-    # Definir la ruta de la carpeta de "Descargas"
-    path_descargas = ruta_descargas()
-    
-    # Verificar si la ruta de destino es válida
-    if not os.path.exists(destino_final):
-        print(f"La ruta de destino no existe: {destino_final}")
-        return
-    
-    # Verificar si la carpeta de "Descargas" existe
-    if not os.path.exists(path_descargas):
-        print(f"La carpeta de 'Descargas' no existe: {path_descargas}")
-        return
-
-    # Obtener una lista de todos los archivos en la carpeta de "Descargas"
-    archivos = os.listdir(path_descargas)
-
-    # Mover cada archivo a la carpeta de destino final
-    for archivo in archivos:
-        ruta_origen = os.path.join(path_descargas, archivo)
-        if os.path.isfile(ruta_origen):
-            try:
-                shutil.move(ruta_origen, destino_final)
-                print(f"Archivo movido: {archivo}")
-            except Exception as e:
-                print(f"No se pudo mover el archivo {archivo}: {e}")
 
 
 
@@ -216,10 +154,9 @@ seleccion_textbox = agregar_textbox(frame_seleccion)
 seleccion_seleccion = boton_carpeta(frame_seleccion)
 seleccion_seleccion.config(command=lambda: seleccionar_carpeta(seleccion_textbox))
 seleccion_aceptar = agregar_boton(frame_seleccion,"Aceptar")
-
-seleccion_aceptar.config(command=lambda: crear_directorio(generar_ruta(seleccion_textbox, ciclos, periodos)))
+seleccion_aceptar.config(command=lambda: crear_directorio_gui(seleccion_textbox, ciclos, periodos,3))
 seleccion_regresar = agregar_boton(frame_seleccion,"Regresar")
-seleccion_regresar.config(command=lambda: print(generar_ruta(seleccion_textbox, ciclos, periodos))) #ir_a_pestaña_n(2)
+seleccion_regresar.config(command=lambda: ir_a_pestaña_n(2))
 notebook.add(frame_seleccion, text="Selección de carpeta")
 
 
@@ -256,28 +193,7 @@ for i, label in enumerate(labels_definidos):
     status_label.grid(row=i+2, column=1, padx=10)
     labels.append(status_label)
 
-"""
-funciones = [
-    (renombrar_archivos, [generar_ruta(seleccion_textbox, ciclos, periodos), True]),
-    (mover_archivos, [generar_ruta(seleccion_textbox, ciclos, periodos), True]),
-    (depurar, [generar_ruta(seleccion_textbox, ciclos, periodos), True]),
-    (homologar, [generar_ruta(seleccion_textbox, ciclos, periodos), True])
-]
-"""
-def renombrar_archivos_gui(seleccion_textbox, ciclos, periodos, boolean= True):
-    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
-    renombrar_archivos(ruta_base, boolean)
-def mover_archivos_gui(seleccion_textbox, ciclos, periodos, boolean= True):
-    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
-    mover_archivos(ruta_base, boolean)
 
-def depurar_gui(seleccion_textbox, ciclos, periodos, boolean= True):
-    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
-    depurar(ruta_base, boolean)
-
-def homologar_gui(seleccion_textbox, ciclos, periodos, boolean= True):
-    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
-    homologar(ruta_base, boolean)
 
 funciones = [
     (renombrar_archivos_gui,[seleccion_textbox, ciclos, periodos, True]),
@@ -292,8 +208,6 @@ crudo_Generar.config(
     command=lambda: ejecutar_funciones(frame_procesamiento, labels, funciones))
 
 notebook.add(frame_procesamiento, text="Procesamiento")
-
-
 
 
 # Pestaña Generacion de Informes

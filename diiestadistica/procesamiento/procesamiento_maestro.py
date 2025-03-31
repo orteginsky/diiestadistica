@@ -1,38 +1,36 @@
-from .validacion_html import procesar_tabla_html
-from .validacion_html import limpiar_html
-from .validacion_html import procesar_tabla_html
-from .seleccionar_carpeta import seleccionar_carpeta
-from .depurar import expandir_tabla
-from .depurar import eliminar_columnas_subtotales
-from .depurar import reorganizar_datos
-from .depurar import generar_columnas
-from .depurar import coincidencia
-from .creacion_tabla import definir_encabezados
-from .validacion_datos import dividir_subtotales
-
+#Funciones extra-externas
+from ..utils.coincidencia import coincidencia
+#funciones externas
+from html_procesamiento import procesar_tabla_html
+from html_procesamiento import limpiar_html
+from transformaciones import expandir_tabla
+from transformaciones import definir_encabezados
+from transformaciones import eliminar_columnas_subtotales
+from transformaciones import reorganizar_datos
+from transformaciones import generar_columnas
+from transformaciones import dividir_subtotales
+#funciones particulares
 from bs4 import BeautifulSoup
+#librerias
 import os
 import re
 
-
-def procesamiento_aplanamiento(ruta_carpeta,ciclo,periodo):
-	ruta_periodo = f"{ruta_carpeta}/periodo_{ciclo}_{periodo}"
+def procesamiento_aplanamiento(ruta_periodo):
 	ruta_xml = f"{ruta_periodo}/archivos_originales"
 	ruta_aplanada = f"{ruta_periodo}/archivos_originales"
-
+	ruta_subtotales = f"{ruta_periodo}/subtotales"
 	for nombre_archivo in os.listdir(ruta_xml):
 		try:
 			if nombre_archivo.endswith("xls"):
-				ruta_archivo = f"{ruta_carpeta}/{nombre_archivo}"
+				ruta_archivo = f"{ruta_xml}/{nombre_archivo}"
 				with open(ruta_archivo, "r", encoding="latin-1") as archivo_html:
 					soup = BeautifulSoup(archivo_html, "html.parser")
 				soup_encabezados = soup.find("thead")
 				encabezados_matriz = procesar_tabla_html(soup_encabezados)
 				encabezados_df = expandir_tabla(encabezados_matriz)
-				nombres_encabezados = definir_encabezados(encabezados_df)
 				datos_html = soup.find("tbody").find("tbody")
 				if datos_html:
-					print("ok")
+					print("Tabla dentro de otro tabla")
 				else:
 					datos_html = soup.find("tbody")
 				datos_html = limpiar_html(datos_html)
@@ -70,9 +68,9 @@ def procesamiento_aplanamiento(ruta_carpeta,ciclo,periodo):
 				datos_exp.rename(columns=lambda col: 'Unidad.Academica' if coincidencia('Dependencia', col) else col, inplace=True)
 				datos_exp, subtotales = dividir_subtotales(datos_exp)
 
-				ruta_guardar = f"C:/Users/Usuario/Desktop/diiestadistica/excel/{nombre_archivo_guardar}.xlsx"
+				ruta_guardar = f"{ruta_aplanada}/{nombre_archivo_guardar}.xlsx"
 				datos_exp.to_excel(ruta_guardar, index=False)
-				ruta_guardar = f"C:/Users/Usuario/Desktop/diiestadistica/subtotales/{nombre_archivo_guardar}.xlsx"
-				subtotales.to_excel(ruta_guardar, index=False)
+				ruta_guardar_subtotales = f"{ruta_subtotales}/{nombre_archivo_guardar}.xlsx"
+				subtotales.to_excel(ruta_guardar_subtotales, index=False)
 		except:
 			print(nombre_archivo)

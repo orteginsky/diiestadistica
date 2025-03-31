@@ -1,0 +1,40 @@
+diiestadistica/
+│── diiestadistica/
+│   ├── procesamiento/
+│   │   ├── __init__.py
+│   │
+│   ├── informes/
+│   │   ├── __init__.py
+│   │
+│   ├── conexion/
+│   │   ├── __init__.py
+│   │
+│   ├── utils/
+│   │   ├── __init__.py
+│   │
+│   ├── gui/
+│   │   ├── interfaz.py
+│   │
+│   ├── logs/
+│   │   ├── __init__.py
+│   │
+│   ├── main.py
+│
+│── tests/
+│   ├── test_procesamiento.py
+│   ├── test_informes.py
+│
+│── docs/
+│   ├── index.md
+│   ├── instalación.md
+│   ├── uso.md
+│
+│── ejemplos/
+│   ├── ejemplo_limpieza.py
+│   ├── ejemplo_reporte.py
+│
+│── requirements.txt            # Lista de dependencias necesarias
+│── setup.py                    # Empaquetado de la librería
+│── README.md                   # Descripción del proyecto
+│── .gitignore                  # Archivos a ignorar en Git
+
