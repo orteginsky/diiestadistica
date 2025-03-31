@@ -2,6 +2,7 @@ from ..utils.archivo_utils import renombrar_archivos
 from ..utils.os_utils import limpiar_descargas
 from ..utils.os_utils import crear_directorio
 from ..utils.os_utils import mover_archivos
+from ..procesamiento.procesamiento_maestro import procesamiento_aplanamiento
 
 from .ventana_base import ventana_base
 from .ventana_base import agregar_boton
@@ -73,9 +74,9 @@ def mover_archivos_gui(seleccion_textbox, ciclos, periodos, boolean= True):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
     mover_archivos(ruta_base, boolean)
 
-def depurar_gui(seleccion_textbox, ciclos, periodos, boolean= True):
+def depurar_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
-    depurar(ruta_base, boolean)
+    procesamiento_aplanamiento(ruta_base)
 
 def homologar_gui(seleccion_textbox, ciclos, periodos, boolean= True):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
@@ -103,17 +104,25 @@ def ejecutar_funciones(frame, labels, funciones, idx=0):
     # Llamar a la siguiente función después de terminar
     frame.after(100, lambda: ejecutar_funciones(frame, labels, funciones, idx + 1))
 
-
-
-
 root = tk.Tk()
 root = ventana_base(root,"I N I C I O")
-
 
 # Crear el estilo
 style = ttk.Style()
 style.configure("Vertical.TNotebook", tabposition="wn")
-style.configure("Vertical.TNotebook.Tab", width=40, padding=[10, 20])
+style.configure(
+    "Vertical.TNotebook.Tab",
+    width=35,
+    background="#F1F1F1",
+    foreground="#333333",
+    padding=[10, 20],
+    font=("Arial", 16)
+)
+
+# Color cuando está seleccionada
+style.map("Vertical.TNotebook.Tab",
+          background=[("selected", "#F1F1F1")],
+          foreground=[("selected", "#5A1236")])
 
 notebook = ttk.Notebook(root, style="Vertical.TNotebook")
 notebook.pack(expand=True, fill="both")
@@ -145,7 +154,7 @@ datos_regresar = agregar_boton(frame_datos,"Regresar")
 datos_regresar.config(command=lambda: ir_a_pestaña_n(1))
 datos_Confirmar = agregar_boton(frame_datos,"Confirmar Selección")
 datos_Confirmar.config(command=lambda: descargar(ciclos,periodos))
-notebook.add(frame_datos, text="Ingreso de Datos")
+notebook.add(frame_datos, text="Selección del Periodo Escolar")
 
 
 # Pestaña Selección de carpeta
@@ -198,7 +207,7 @@ for i, label in enumerate(labels_definidos):
 funciones = [
     (renombrar_archivos_gui,[seleccion_textbox, ciclos, periodos, True]),
     (mover_archivos_gui,[seleccion_textbox, ciclos, periodos, True]),
-    (depurar_gui,[seleccion_textbox, ciclos, periodos, True]),
+    (depurar_gui,[seleccion_textbox, ciclos, periodos]),
     (homologar_gui,[seleccion_textbox, ciclos, periodos, True])
     ]
 
@@ -208,7 +217,6 @@ crudo_Generar.config(
     command=lambda: ejecutar_funciones(frame_procesamiento, labels, funciones))
 
 notebook.add(frame_procesamiento, text="Procesamiento")
-
 
 # Pestaña Generacion de Informes
 frame_generacion = ttk.Frame(notebook)

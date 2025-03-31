@@ -1,14 +1,6 @@
+from ..procesamiento.procesamiento_maestro import procesamiento_aplanamiento
+from ..gui.seleccion_archivos import seleccionar_carpeta
 
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
-import time
+ruta = seleccionar_carpeta()
 
-from ..diiestadistica.scraping.credenciales import ingresar_credenciales
-
-
-driver = webdriver.Chrome()
-
-ingresar_credenciales(driver)
+procesamiento_aplanamiento(ruta)

@@ -9,7 +9,7 @@ import re
 
 def ventana_base(nueva_ventana,titulo="M A P R E"):
     nueva_ventana.title(titulo)
-    nueva_ventana.geometry("900x400")
+    nueva_ventana.geometry("900x500")
     color_fondo = "#5A1236"
     nueva_ventana.configure(bg=color_fondo)
     return nueva_ventana

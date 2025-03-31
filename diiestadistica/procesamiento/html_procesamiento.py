@@ -69,9 +69,6 @@ def procesar_tabla_html(soup):
     
     return lista_matrices
 
-
-
-
 def validar_rectangulo(matriz):
     k = len(matriz)
     vk=0

@@ -1,14 +1,15 @@
 #Funciones extra-externas
 from ..utils.coincidencia import coincidencia
 #funciones externas
-from html_procesamiento import procesar_tabla_html
-from html_procesamiento import limpiar_html
-from transformaciones import expandir_tabla
-from transformaciones import definir_encabezados
-from transformaciones import eliminar_columnas_subtotales
-from transformaciones import reorganizar_datos
-from transformaciones import generar_columnas
-from transformaciones import dividir_subtotales
+from .html_procesamiento import procesar_tabla_html
+from .html_procesamiento import limpiar_html
+from .transformaciones import expandir_tabla
+from .transformaciones import definir_encabezados
+from .transformaciones import eliminar_columnas_subtotales
+from .transformaciones import reorganizar_datos
+from .transformaciones import generar_columnas
+from .transformaciones import dividir_subtotales
+
 #funciones particulares
 from bs4 import BeautifulSoup
 #librerias
@@ -17,7 +18,7 @@ import re
 
 def procesamiento_aplanamiento(ruta_periodo):
 	ruta_xml = f"{ruta_periodo}/archivos_originales"
-	ruta_aplanada = f"{ruta_periodo}/archivos_originales"
+	ruta_aplanada = f"{ruta_periodo}/archivos_aplanados"
 	ruta_subtotales = f"{ruta_periodo}/subtotales"
 	for nombre_archivo in os.listdir(ruta_xml):
 		try:
