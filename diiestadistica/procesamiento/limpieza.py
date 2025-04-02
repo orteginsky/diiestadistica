@@ -58,7 +58,8 @@ def limpiar_nombres_programas(dataframe, columna):
         r"^M en C y Tec de Vac y Bio$": "Maestría en Ciencias y Tecnología de Vacunas y Bioterapéuticos",
         r"^Dr en C y Tec de Vacunas y Bioterapéuticos$": "Doctorado en Ciencias y Tecnología de Vacunas y Bioterapéuticos",
         r"^Ingeniería en Mecatrónica$": "Ingeniería Mecatrónica",
-        r"^Maestría en Ciencia y Tecnología de Vacunas y Bioterapéuticos$": "Maestría en Ciencias y Tecnología de Vacunas y Bioterapéuticos"
+        r"^Maestría en Ciencia y Tecnología de Vacunas y Bioterapéuticos$": "Maestría en Ciencias y Tecnología de Vacunas y Bioterapéuticos",
+        r"  ": " "
     }
 
     # Aplicar los reemplazos con expresiones regulares

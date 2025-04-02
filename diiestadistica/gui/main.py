@@ -3,6 +3,8 @@ from ..utils.os_utils import limpiar_descargas
 from ..utils.os_utils import crear_directorio
 from ..utils.os_utils import mover_archivos
 from ..procesamiento.procesamiento_maestro import procesamiento_aplanamiento
+from ..procesamiento.procesamiento_maestro import procesamiento_limpieza
+from ..informes.arch_maestro import informes_mapre
 
 from .ventana_base import ventana_base
 from .ventana_base import agregar_boton
@@ -37,8 +39,10 @@ def descargar(ciclos, periodos):
     periodo = periodos.get()
     print(ciclo,periodo)
     activar_descarga_intranet(ciclo,periodo)
-def mapre():
+def mapre(seleccion_textbox, ciclos, periodos):
     print("hostia tio ya esta generandose el mapre")
+    ruta = generar_ruta(seleccion_textbox, ciclos, periodos)
+    informes_mapre(ruta)
     quitar()
 
 def generar_ruta(seleccion_textbox, ciclos, periodos):
@@ -46,7 +50,6 @@ def generar_ruta(seleccion_textbox, ciclos, periodos):
     ciclo = ciclos.get()
     periodo = periodos.get()
     ruta_base = f"{carpeta}/periodo_{ciclo}_{periodo}"
-    print(ruta_base)
     return ruta_base
 
 
@@ -56,11 +59,6 @@ def depurar(ruta_base, bolean = False):
     else:
         print("se depuro")
 
-def homologar(ruta_base, bolean = False):
-    if bolean:
-        print(f"se homologo en{ruta_base}")
-    else:
-        print("se homologo")
 
 def crear_directorio_gui(seleccion_textbox, ciclos, periodos, pestaña):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
@@ -79,9 +77,9 @@ def depurar_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
     procesamiento_aplanamiento(ruta_base)
 
-def homologar_gui(seleccion_textbox, ciclos, periodos, boolean= True):
+def homologar_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
-    homologar(ruta_base, boolean)
+    procesamiento_limpieza(ruta_base)
 
 def ejecutar_funciones(frame, labels, funciones, idx=0):
     """
@@ -164,7 +162,7 @@ seleccion_textbox = agregar_textbox(frame_seleccion)
 seleccion_seleccion = boton_carpeta(frame_seleccion)
 seleccion_seleccion.config(command=lambda: seleccionar_carpeta(seleccion_textbox))
 seleccion_aceptar = agregar_boton(frame_seleccion,"Aceptar")
-seleccion_aceptar.config(command=lambda: crear_directorio_gui(seleccion_textbox, ciclos, periodos,3))
+seleccion_aceptar.config(command=lambda: crear_directorio_gui(seleccion_textbox, ciclos, periodos,4))
 seleccion_regresar = agregar_boton(frame_seleccion,"Regresar")
 seleccion_regresar.config(command=lambda: ir_a_pestaña_n(2))
 notebook.add(frame_seleccion, text="Selección de carpeta")
@@ -209,7 +207,7 @@ funciones = [
     (mover_archivos_gui,[seleccion_textbox, ciclos, periodos, True]),
     (renombrar_archivos_gui,[seleccion_textbox, ciclos, periodos, True]),
     (depurar_gui,[seleccion_textbox, ciclos, periodos]),
-    (homologar_gui,[seleccion_textbox, ciclos, periodos, True])
+    (homologar_gui,[seleccion_textbox, ciclos, periodos])
     ]
 
 crudo_regresar.config(
@@ -224,8 +222,16 @@ frame_generacion = ttk.Frame(notebook)
 generacion_regresar = agregar_boton(frame_generacion,"Regresar")
 generacion_regresar.config(command=lambda: ir_a_pestaña_n(1))
 generacion_Generar = agregar_boton(frame_generacion,"Generar MAPRE")
-generacion_Generar.config(command=mapre)
+generacion_Generar.config(command=lambda: mapre(seleccion_textbox, ciclos, periodos))
 notebook.add(frame_generacion, text="Informes")
+
+# Pestaña enviar archivos
+frame_enviar = ttk.Frame(notebook)
+enviar_regresar = agregar_boton(frame_enviar,"Regresar")
+enviar_regresar.config(command=lambda: ir_a_pestaña_n(5))
+enviar_Generar = agregar_boton(frame_enviar,"Enviar Informes")
+enviar_Generar.config(command=lambda: mapre(seleccion_textbox, ciclos, periodos))
+notebook.add(frame_enviar, text="Enviar Informes")
 
 estilizar_pestañas(notebook)
 notebook.select(notebook.tabs()[0])

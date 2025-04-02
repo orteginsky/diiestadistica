@@ -9,9 +9,7 @@ from .transformaciones import eliminar_columnas_subtotales
 from .transformaciones import reorganizar_datos
 from .transformaciones import generar_columnas
 from .transformaciones import dividir_subtotales
-from .transformaciones import eliminar_ceros
-from .transformaciones import eliminar_sin_afectar
-from .limpieza import correccion_conceptos
+from .limpieza import limpiar_nombres_programas
 
 #funciones particulares
 from bs4 import BeautifulSoup
@@ -45,8 +43,13 @@ def procesamiento_aplanamiento(ruta_periodo):
 				datos_exp.columns = definir_encabezados(encabezados_df)
 				
 				if re.search('Egresados',nombre_archivo):
-					datos_exp = reorganizar_datos(datos_exp)
-					datos_exp.rename(columns={'col_2':'Sexo'}, inplace= True)
+					if re.search('NP',nombre_archivo):
+						datos_exp = eliminar_columnas_subtotales(datos_exp)
+						datos_exp = reorganizar_datos(datos_exp)
+						datos_exp.rename(columns={'col_1':'Periodo','col_2':'Sexo'}, inplace= True)
+					else:
+						datos_exp = reorganizar_datos(datos_exp)
+						datos_exp.rename(columns={'col_2':'Sexo'}, inplace= True)
 				else:
 					datos_exp = eliminar_columnas_subtotales(datos_exp)
 					datos_exp = reorganizar_datos(datos_exp)
@@ -62,19 +65,20 @@ def procesamiento_aplanamiento(ruta_periodo):
 						  coincidencia('NS_Titulados',nombre_archivo) or \
 							coincidencia('NMS_Aprovechamiento',nombre_archivo) or \
 								coincidencia('NS_Aprovechamiento',nombre_archivo) or \
-									coincidencia('NP_Basica',nombre_archivo) or \
-										coincidencia('NS_Grupos',nombre_archivo) :
+									coincidencia('NP_Basica',nombre_archivo):
 					datos_exp.rename(columns={'col_1':'Concepto','col_2':'Sexo'}, inplace= True)
 				elif coincidencia('Semestre',nombre_archivo) or \
 					coincidencia('NMS_Basica',nombre_archivo) or \
 						coincidencia('NS_Basica',nombre_archivo) or \
 							coincidencia('NMS_Grupos',nombre_archivo) or \
-								coincidencia('NP_Grupos',nombre_archivo):
+								coincidencia('NP_Grupos',nombre_archivo) or \
+									coincidencia('NS_Grupos',nombre_archivo):
 					datos_exp.rename(columns={'col_2':'Concepto','col_3':'Sexo'}, inplace= True)
 				elif coincidencia('NP_Titulados',nombre_archivo):
-					datos_exp.rename(columns={'col_2':'Sexo'}, inplace= True)
+					datos_exp.rename(columns={'col_1':'Periodo','col_2':'Sexo'}, inplace= True)
 
 				datos_exp.rename(columns=lambda col: 'Unidad.Academica' if coincidencia('Dependencia', col) else col, inplace=True)
+				datos_exp.rename(columns=lambda col: 'Programa' if coincidencia('Programa', col) else col, inplace=True)
 				datos_exp, subtotales = dividir_subtotales(datos_exp)
 
 				ruta_guardar = f"{ruta_aplanada}/{nombre_archivo_guardar}.xlsx"
@@ -88,22 +92,11 @@ def procesamiento_aplanamiento(ruta_periodo):
 def procesamiento_limpieza(ruta_periodo):
 	ruta_aplanada = f"{ruta_periodo}/archivos_aplanados"
 	ruta_homo = f"{ruta_periodo}/archivos_homologados"
-	for nombre_archivo in os.listdir(ruta_aplanada):
-		try:
-			if nombre_archivo.endswith("xlsx"):
-				nombre_archivo_guardar = re.sub('.xlsx','',nombre_archivo)
-				ruta_archivo = f"{ruta_aplanada}/{nombre_archivo}"
-				dataframe = pd.read_excel(ruta_archivo)
-				dataframe = eliminar_ceros(dataframe)
-				#dataframe = correccion_conceptos(dataframe)
-				ruta_homo_guardar = f"{ruta_homo}/{nombre_archivo_guardar}.xlsx"
-				dataframe.to_excel(ruta_homo_guardar)
-		except:
-			print(nombre_archivo)
-
-def procesamiento_limpieza(ruta_periodo):
-	ruta_aplanada = f"{ruta_periodo}/archivos_aplanados"
-	ruta_homo = f"{ruta_periodo}/archivos_homologados"
+	ruta_catalogos = "/media/sf_Y_DRIVE/Homologacion/Catalogos Programas/"
+	ruta_programas = f"{ruta_catalogos}/programas.xlsx"
+	ruta_unidades = f"{ruta_catalogos}/unidades_academicas.xlsx"
+	programas = pd.read_excel(ruta_programas)
+	unidades = pd.read_excel(ruta_unidades)
 	for nombre_archivo in os.listdir(ruta_aplanada):
 		try:
 			if nombre_archivo.endswith("xlsx"):
@@ -146,9 +139,32 @@ def procesamiento_limpieza(ruta_periodo):
 						"^Mix$": "Mixto",
 						"^Mat$": "Matutino",
 						"^Primer Ingreso$": "Nuevo Ingreso",
-						"." : " "
+						"\\.": " "
 					}, regex=True)
+
+				dataframe = limpiar_nombres_programas(dataframe, 'Programa')
+
+				duplicados = dataframe[dataframe["Programa"].isin(["Tronco Común", "Propedéutico"])]
+				duplicados = duplicados.merge(unidades, left_on="Unidad.Academica", right_on="nombre_intranet", how="left")
+				duplicados = duplicados.merge(programas, left_on=["Programa",'Rama_unidad'], right_on=['programa_intranet','Rama'], how="left")
+
+				unicos = dataframe[~dataframe["Programa"].isin(["Tronco Común", "Propedéutico"])]
+				unicos = unicos.merge(unidades, left_on="Unidad.Academica", right_on="nombre_intranet", how="left")
+				unicos = unicos.merge(programas, left_on="Programa", right_on="programa_intranet", how="left")
+
+				dataframe_final = pd.concat([duplicados, unicos], ignore_index=True)
+
 				ruta_homo_guardar = f"{ruta_homo}/{nombre_archivo_guardar}.xlsx"
-				dataframe.to_excel(ruta_homo_guardar, index=False)
+				dataframe_final.to_excel(ruta_homo_guardar, index=False)
 		except:
 			print(nombre_archivo)
+
+
+
+"""
+				filtro = []
+				if ("nombre_intranet" not in unidades.columns) and ("Rama_intranet" not in unidades.columns):
+					filtro.append(True)
+				else:
+					filtro.append(False)
+"""
