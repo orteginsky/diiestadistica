@@ -1,5 +1,6 @@
 #Funciones extra-externas
 from ..utils.coincidencia import coincidencia
+from ..utils.os_utils import extraer_periodo
 #funciones externas
 from .html_procesamiento import procesar_tabla_html
 from .html_procesamiento import limpiar_html
@@ -10,6 +11,7 @@ from .transformaciones import reorganizar_datos
 from .transformaciones import generar_columnas
 from .transformaciones import dividir_subtotales
 from .limpieza import limpiar_nombres_programas
+from .limpieza import capitalizar
 
 #funciones particulares
 from bs4 import BeautifulSoup
@@ -22,6 +24,8 @@ def procesamiento_aplanamiento(ruta_periodo):
 	ruta_xml = f"{ruta_periodo}/archivos_originales"
 	ruta_aplanada = f"{ruta_periodo}/archivos_aplanados"
 	ruta_subtotales = f"{ruta_periodo}/subtotales"
+	periodo = extraer_periodo(ruta_periodo)
+	periodo = re.sub("_","/",periodo)
 	for nombre_archivo in os.listdir(ruta_xml):
 		try:
 			if nombre_archivo.endswith("xls"):
@@ -43,13 +47,14 @@ def procesamiento_aplanamiento(ruta_periodo):
 				datos_exp.columns = definir_encabezados(encabezados_df)
 				
 				if re.search('Egresados',nombre_archivo):
-					if re.search('NP',nombre_archivo):
+					if re.search('NMS',nombre_archivo):
 						datos_exp = eliminar_columnas_subtotales(datos_exp)
 						datos_exp = reorganizar_datos(datos_exp)
-						datos_exp.rename(columns={'col_1':'Periodo','col_2':'Sexo'}, inplace= True)
+						datos_exp.rename(columns={'col_1':'Fin_periodo','col_2':'Sexo','col_3':'Turno'}, inplace= True)
 					else:
+						datos_exp = eliminar_columnas_subtotales(datos_exp)
 						datos_exp = reorganizar_datos(datos_exp)
-						datos_exp.rename(columns={'col_2':'Sexo'}, inplace= True)
+						datos_exp.rename(columns={'col_1':'Fin_periodo','col_2':'Sexo'}, inplace= True)
 				else:
 					datos_exp = eliminar_columnas_subtotales(datos_exp)
 					datos_exp = reorganizar_datos(datos_exp)
@@ -79,6 +84,7 @@ def procesamiento_aplanamiento(ruta_periodo):
 
 				datos_exp.rename(columns=lambda col: 'Unidad.Academica' if coincidencia('Dependencia', col) else col, inplace=True)
 				datos_exp.rename(columns=lambda col: 'Programa' if coincidencia('Programa', col) else col, inplace=True)
+				datos_exp['Periodo'] = periodo
 				datos_exp, subtotales = dividir_subtotales(datos_exp)
 
 				ruta_guardar = f"{ruta_aplanada}/{nombre_archivo_guardar}.xlsx"
@@ -141,7 +147,19 @@ def procesamiento_limpieza(ruta_periodo):
 						"^Primer Ingreso$": "Nuevo Ingreso",
 						"\\.": " "
 					}, regex=True)
-
+				
+				if "Turno" in dataframe.columns:
+					dataframe["Turno"] = dataframe["Turno"].astype(str)
+					dataframe = dataframe[~dataframe["Turno"].str.contains("Subt", na=False)]
+					dataframe["Turno"] = dataframe["Turno"].replace({
+						"^V$": "Vespertino",
+						"^M$": "Matutino",
+						"^Ves$": "Vespertino",
+						"^Mix$": "Mixto",
+						"^Mat$": "Matutino",
+						"\\.": " "
+					}, regex=True)
+				
 				dataframe = limpiar_nombres_programas(dataframe, 'Programa')
 
 				duplicados = dataframe[dataframe["Programa"].isin(["Tronco Común", "Propedéutico"])]

@@ -1,6 +1,7 @@
 import os
 import shutil
 import platform
+import re
 
 def limpiar_descargas():
     # Detectar la carpeta de Descargas según el sistema operativo
@@ -102,3 +103,14 @@ def mover_archivos(ruta_base, bolean = False):
             except Exception as e:
                 print(f"No se pudo mover el archivo {archivo}: {e}")
 
+def extraer_periodo(ruta_directorio):
+    
+    nombre_directorio = os.path.basename(ruta_directorio)
+
+    
+    match = re.search(r'periodo_([\d]{4}-[\d]{4}_[12])', nombre_directorio)
+
+    if match:
+        return match.group(1)
+    else:
+        return None

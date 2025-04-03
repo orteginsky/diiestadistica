@@ -61,7 +61,7 @@ def descargar_reportes(driver):
 
 def ultimo_reporte(driver):
     """
-    Hace clic en todas las imágenes <img src='/images/excel.png'> que estén visibles en la página.
+    Hace clic en la ultima de las imágenes <img src='/images/excel.png'> que estén visibles en la página.
 
     :param driver: WebDriver de Selenium
     """
@@ -83,4 +83,28 @@ def ultimo_reporte(driver):
     except Exception as e:
         print(f"Error al hacer al hacer click en descarga: {e}")
 
+
+def primer_reporte(driver):
+    """
+    Hace clic en la ultima de las imágenes <img src='/images/excel.png'> que estén visibles en la página.
+
+    :param driver: WebDriver de Selenium
+    """
+    try:
+        # Encuentra todas las imágenes con src="/images/excel.png"
+        imagenes = WebDriverWait(driver, 5).until(
+            EC.presence_of_all_elements_located((By.XPATH, "//img[@src='/images/excel.png']"))
+        )
+
+        # Filtra solo las imágenes visibles
+        imagenes_visibles = [img for img in imagenes if img.is_displayed()]
+
+        if not imagenes_visibles:
+            print("No hay exceles visibles para descargar.")
+            return
+        else:
+            imagenes_visibles[0].click()
+            time.sleep(2)
+    except Exception as e:
+        print(f"Error al hacer al hacer click en descarga: {e}")
 

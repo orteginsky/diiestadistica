@@ -2,6 +2,7 @@ import pandas as pd
 import unicodedata
 import re
 
+
 def capitalizar(columna):
     # Convertir todo a minúsculas y luego a formato de título (capitalizar)
     columna = columna.str.lower().str.title()
@@ -68,6 +69,7 @@ def limpiar_nombres_programas(dataframe, columna):
     for patron, reemplazo in reemplazos.items():
         dataframe[columna] = dataframe[columna].str.replace(patron, reemplazo, regex=True)
 
+    dataframe[columna] = capitalizar(dataframe[columna])
     return dataframe
 
 

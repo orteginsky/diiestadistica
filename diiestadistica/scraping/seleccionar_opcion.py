@@ -4,7 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 import time
-from .descargar_reportes import descargar_reportes, descargar_reportes_nivel, ultimo_reporte
+from .descargar_reportes import descargar_reportes, descargar_reportes_nivel, ultimo_reporte, primer_reporte
 
 niveles=["MEDIO SUPERIOR","SUPERIOR","POSGRADO"]
 ########################################################################################
@@ -187,7 +187,7 @@ def seleccionar_opcion_egresados(driver, palabra):
                     time.sleep(4)
                 else:
                     opcion.click()
-                    ultimo_reporte(driver)
+                    primer_reporte(driver)
                     time.sleep(4)
                 div_combo.click()
 

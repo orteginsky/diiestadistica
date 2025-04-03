@@ -48,7 +48,7 @@ def renombrar_archivos(ruta_carpeta, bolean=False):
 	"Concentrado_Matricula_Por_Grupos_Edad_NMS (1).xls":"NS_Grupos.xls",
 	"Concentrado_Matricula_Por_Grupos_Edad_NMS (2).xls":"NP_Grupos.xls",
 	"ConcentradoEgresadosMedioSuperior.xls":"NMS_Egresados.xls",
-	"ConcentradoEgresadosMedioSuperior (1).xls":"NS_Egresados.xls",
+	"ConcentradoEgresadosSuperior.xls":"NS_Egresados.xls",
 	"ConcentradoEgresadosPostgrado.xls":"NP_Egresados.xls",
 	"ConcentradoTitulacion.xls":"NMS_Titulados.xls",
 	"ConcentradoTitulacion (1).xls":"NS_Titulados.xls",
