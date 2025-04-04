@@ -24,4 +24,8 @@ def seleccionar_archivo():
         return
     
 if __name__ == "__main__":
-    print(seleccionar_archivo())
+    import os
+    ruta=seleccionar_archivo()
+    print(ruta)
+    _, nombre_archivo =os.path.split(ruta)
+    print(nombre_archivo)

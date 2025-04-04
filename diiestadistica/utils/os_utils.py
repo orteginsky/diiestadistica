@@ -2,6 +2,7 @@ import os
 import shutil
 import platform
 import re
+import zipfile
 
 def limpiar_descargas():
     # Detectar la carpeta de Descargas según el sistema operativo
@@ -114,3 +115,11 @@ def extraer_periodo(ruta_directorio):
         return match.group(1)
     else:
         return None
+    
+def comprimir_archivo(ruta_archivo):
+    directorio, nombre = os.path.split(ruta_archivo)
+    nombre_zip = re.sub("xlsx","zip",nombre)
+    ruta_zip = os.path.join(directorio, nombre_zip)
+
+    with zipfile.ZipFile(ruta_zip, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        zipf.write(ruta_archivo, arcname=nombre)
