@@ -110,6 +110,7 @@ def procesamiento_limpieza(ruta_periodo):
 				ruta_archivo = f"{ruta_aplanada}/{nombre_archivo}"
 				dataframe = pd.read_excel(ruta_archivo)
 				if "Sexo" in dataframe.columns:
+					dataframe = dataframe[dataframe['Sexo']!='H..M']
 					left_on = [col for col in dataframe.columns if col not in ['Sexo','Datos']]
 					columnas_agrupacion = [col for col in dataframe.columns if col not in ['Sexo','Datos']]
 					ceros = dataframe.groupby(columnas_agrupacion, as_index=False)['Datos'].sum()
@@ -123,7 +124,6 @@ def procesamiento_limpieza(ruta_periodo):
 						"^Hom$": "Hombres",
 						"^Muj$": "Mujeres"
 					}, regex=True)
-					dataframe = dataframe[dataframe['Sexo']!='H..M']
 				elif "Concepto" in dataframe.columns:
 					left_on = [col for col in dataframe.columns if col not in ['Concepto','Datos']]
 					columnas_agrupacion = [col for col in dataframe.columns if col not in ['Concepto','Datos']]

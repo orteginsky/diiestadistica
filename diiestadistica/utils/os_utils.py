@@ -55,7 +55,8 @@ def crear_directorio(ruta_base):
         "archivos_aplanados",
         "reportes",
         "archivos_homologados",
-        "subtotales"
+        "subtotales",
+        "errores"
     ]
 
     try:

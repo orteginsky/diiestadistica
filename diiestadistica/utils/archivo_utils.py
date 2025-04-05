@@ -1,6 +1,8 @@
 from ..gui.seleccion_archivos import seleccionar_carpeta
 
 import os
+import pandas as pd
+
 
 def cambiar_extencion_carpeta(old_extension = "xls", new_extension = "html"):
     carpeta = seleccionar_carpeta()
@@ -83,3 +85,43 @@ def renombrar_archivos(ruta_carpeta, bolean=False):
             print(f"Sin cambio: '{archivo}' no está en el diccionario.")
 
 
+
+def eliminar_xlsx_vacios(ruta_directorio):
+    """
+    Elimina archivos .xlsx que solo tienen encabezados sin datos desde un directorio dado.
+
+    Parámetros:
+    ruta_directorio (str): Ruta absoluta del directorio que contiene archivos .xlsx
+    """
+    for archivo in os.listdir(ruta_directorio):
+        if archivo.endswith(".xlsx"):
+            ruta_archivo = os.path.join(ruta_directorio, archivo)
+            try:
+                df = pd.read_excel(ruta_archivo)
+                if df.empty or df.dropna(how='all').shape[0] == 0:
+                    os.remove(ruta_archivo)
+                    print(f"Archivo eliminado (sin datos): {archivo}")
+            except Exception as e:
+                print(f"No se pudo procesar {archivo}: {e}")
+
+
+def crear_subdirectorios(ruta_base, carpetas):
+    """
+    Crea carpetas dentro de un directorio dado.
+
+    Parámetros:
+        ruta_base (str): Ruta del directorio principal donde se crearán las carpetas.
+        carpetas (list): Lista de nombres de carpetas a crear.
+
+    Retorna:
+        list: Lista de rutas completas de las carpetas creadas o existentes.
+    """
+    rutas_creadas = []
+    for carpeta in carpetas:
+        ruta_carpeta = os.path.join(ruta_base, carpeta)
+        try:
+            os.makedirs(ruta_carpeta, exist_ok=True)
+            rutas_creadas.append(ruta_carpeta)
+        except Exception as e:
+            print(f"No se pudo crear la carpeta '{carpeta}': {e}")
+    return rutas_creadas

@@ -4,6 +4,7 @@ from ..utils.os_utils import crear_directorio
 from ..utils.os_utils import mover_archivos
 from ..procesamiento.procesamiento_maestro import procesamiento_aplanamiento
 from ..procesamiento.procesamiento_maestro import procesamiento_limpieza
+from ..procesamiento.procesar_subtotales import procesar_subtotales
 from ..informes.arch_maestro import informes_mapre
 
 from .ventana_base import ventana_base
@@ -39,11 +40,6 @@ def descargar(ciclos, periodos):
     periodo = periodos.get()
     print(ciclo,periodo)
     activar_descarga_intranet(ciclo,periodo)
-def mapre(seleccion_textbox, ciclos, periodos):
-    print("hostia tio ya esta generandose el mapre")
-    ruta = generar_ruta(seleccion_textbox, ciclos, periodos)
-    informes_mapre(ruta)
-    quitar()
 
 def generar_ruta(seleccion_textbox, ciclos, periodos):
     carpeta = seleccion_textbox.get()
@@ -80,6 +76,17 @@ def depurar_gui(seleccion_textbox, ciclos, periodos):
 def homologar_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
     procesamiento_limpieza(ruta_base)
+
+
+def archivo_maestro_gui(seleccion_textbox, ciclos, periodos):
+    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    informes_mapre(ruta_base)
+def errores_gui(seleccion_textbox, ciclos, periodos):
+    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+def mapre_gui(seleccion_textbox, ciclos, periodos):
+    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+def zip_gui(seleccion_textbox, ciclos, periodos):
+    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
 
 def ejecutar_funciones(frame, labels, funciones, idx=0):
     """
@@ -185,20 +192,20 @@ crudo_Generar = tk.Button(
     font=("Arial", 12),
     bg="#FFFFFF",
     fg="#5A1236")
-crudo_Generar.grid(row=1, column=0)
+crudo_Generar.grid(row=0, column=1)
 
 labels_definidos = [
     tk.Label(frame_procesamiento, text="Direccionando archivos", font=("Arial", 14)),
     tk.Label(frame_procesamiento, text="Generando Nombres", font=("Arial", 14)),
     tk.Label(frame_procesamiento, text="Depurando y limpiando archivos", font=("Arial", 14)),
-    tk.Label(frame_procesamiento, text="Homologando Archivos", font=("Arial", 14)),
+    tk.Label(frame_procesamiento, text="Homologando Archivos", font=("Arial", 14))
 ]
 
 labels = []
 for i, label in enumerate(labels_definidos):
-    label.grid(row=i+2, column=0)
+    label.grid(row=i+1, column=0)
     status_label = tk.Label(frame_procesamiento, text="Esperando...")
-    status_label.grid(row=i+2, column=1, padx=10)
+    status_label.grid(row=i+1, column=1, padx=10)
     labels.append(status_label)
 
 
@@ -219,10 +226,67 @@ notebook.add(frame_procesamiento, text="Procesamiento")
 
 # Pestaña Generacion de Informes
 frame_generacion = ttk.Frame(notebook)
-generacion_regresar = agregar_boton(frame_generacion,"Regresar")
-generacion_regresar.config(command=lambda: ir_a_pestaña_n(1))
-generacion_Generar = agregar_boton(frame_generacion,"Generar MAPRE")
-generacion_Generar.config(command=lambda: mapre(seleccion_textbox, ciclos, periodos))
+frame_generacion.grid()
+
+generacion_regresar = tk.Button(
+    frame_generacion,
+    text="Regresar",
+    font=("Arial", 12),
+    bg="#FFFFFF",
+    fg="#5A1236")
+generacion_regresar.grid(row=0, column=0)
+
+generacion_Generar = tk.Button(
+    frame_generacion,
+    text="Generar Informes",
+    font=("Arial", 12),
+    bg="#FFFFFF",
+    fg="#5A1236")
+generacion_Generar.grid(row=0, column=1)
+
+labels_definidos_generacion = [
+    tk.Label(
+        frame_generacion,
+        text="Archivo Maestro",
+        font=("Arial", 14)
+        ),
+    tk.Label(
+        frame_generacion,
+        text="Errores",
+        font=("Arial", 14)
+        ),
+    tk.Label(
+        frame_generacion,
+        text="Matricula preliminar",
+        font=("Arial", 14)
+        ),
+    tk.Label(
+        frame_generacion,
+        text="Compresion de informes",
+        font=("Arial", 14)
+        )
+]
+
+labels_generacion = []
+for i, label in enumerate(labels_definidos_generacion):
+    label.grid(row=i+1, column=0)
+    status_label = tk.Label(frame_generacion, text="Esperando...")
+    status_label.grid(row=i+1, column=1, padx=10)
+    labels_generacion.append(status_label)
+
+
+generacion_regresar.config(command=lambda: ir_a_pestaña_n(4))
+
+funciones_generacion = [
+    (archivo_maestro_gui,[seleccion_textbox, ciclos, periodos]),
+    (errores_gui,[seleccion_textbox, ciclos, periodos]),
+    (mapre_gui,[seleccion_textbox, ciclos, periodos]),
+    (zip_gui,[seleccion_textbox, ciclos, periodos])
+    ]
+
+generacion_Generar.config(
+    command=lambda: ejecutar_funciones(frame_generacion, labels_generacion, funciones_generacion))
+
 notebook.add(frame_generacion, text="Informes")
 
 # Pestaña enviar archivos
@@ -230,7 +294,6 @@ frame_enviar = ttk.Frame(notebook)
 enviar_regresar = agregar_boton(frame_enviar,"Regresar")
 enviar_regresar.config(command=lambda: ir_a_pestaña_n(5))
 enviar_Generar = agregar_boton(frame_enviar,"Enviar Informes")
-enviar_Generar.config(command=lambda: mapre(seleccion_textbox, ciclos, periodos))
 notebook.add(frame_enviar, text="Enviar Informes")
 
 estilizar_pestañas(notebook)
