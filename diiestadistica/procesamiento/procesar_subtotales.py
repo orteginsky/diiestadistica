@@ -67,29 +67,52 @@ def homologar_subtotales(ruta_subtotales,ruta_unidades):
 			print(nombre_archivo)
 
 def sub_totales_unidad(ruta_global):
-    ruta_homologado = f"{ruta_global}/archivos_homologados"
-    ruta_subtotales = f"{ruta_global}/subtotales"
-    for nombre_archivo in os.listdir(ruta_homologado):
-        try:
-            if nombre_archivo.endswith('xlsx'):
-                dataframe = pd.read_excel(ruta_subtotales)
-                columnas_importantes = [col for col in dataframe.columns if col not in ['Unidad.Academica','Programa']]
-                dataframe.groupby(columnas_importantes, as_index=False)['Datos'].sum()
-                print("se esta generando el subtotal de las ramas")
-        except:
-            print(nombre_archivo)
+	ruta_homologado = f"{ruta_global}/archivos_homologados"
+	ruta_subunidades = f"{ruta_global}/subtotales/sub_totales_unidad"
+	for nombre_archivo in os.listdir(ruta_homologado):
+		try:
+			if nombre_archivo.endswith('xlsx'):
+				ruta_archivo = f"{ruta_homologado}/{nombre_archivo}"
+				dataframe = pd.read_excel(ruta_archivo)
+				columnas_importantes = [col for col in dataframe.columns if col not in ['Programa','Rama_intranet','Datos']]
+				dataframe = dataframe.groupby(columnas_importantes, as_index=False)['Datos'].sum()
+				write_root = f"{ruta_subunidades}/{nombre_archivo}"
+				dataframe.to_excel(write_root, index=False)
+		except:
+			print(nombre_archivo)
+		
 def sub_totales_rama(ruta_global):
-    ruta_homologado = f"{ruta_global}/archivos_homologados"
-    ruta_subtotales = f"{ruta_global}/subtotales"
-    print("se esta generando el subtotal de las ramas")
+	ruta_homologado = f"{ruta_global}/archivos_homologados"
+	ruta_subunidades = f"{ruta_global}/subtotales/sub_totales_rama"
+	for nombre_archivo in os.listdir(ruta_homologado):
+		try:
+			if nombre_archivo.endswith('xlsx'):
+				ruta_archivo = f"{ruta_homologado}/{nombre_archivo}"
+				dataframe = pd.read_excel(ruta_archivo)
+				columnas_importantes = [col for col in dataframe.columns if col not in ['Programa','Unidad_Academica','Datos']]
+				dataframe = dataframe.groupby(columnas_importantes, as_index=False)['Datos'].sum()
+				write_root = f"{ruta_subunidades}/{nombre_archivo}"
+				dataframe.to_excel(write_root, index=False)
+		except:
+			print(nombre_archivo)
 
 def sub_totales_total(ruta_global):
-    ruta_homologado = f"{ruta_global}/archivos_homologados"
-    ruta_subtotales = f"{ruta_global}/subtotales"
-    print("se esta generando el subtotal de las ramas")
+	ruta_homologado = f"{ruta_global}/archivos_homologados"
+	ruta_subunidades = f"{ruta_global}/subtotales/totales"
+	for nombre_archivo in os.listdir(ruta_homologado):
+		try:
+			if nombre_archivo.endswith('xlsx'):
+				ruta_archivo = f"{ruta_homologado}/{nombre_archivo}"
+				dataframe = pd.read_excel(ruta_archivo)
+				columnas_importantes = [col for col in dataframe.columns if col not in ['Programa','Rama_intranet','Datos','Unidad_Academica']]
+				dataframe = dataframe.groupby(columnas_importantes, as_index=False)['Datos'].sum()
+				write_root = f"{ruta_subunidades}/{nombre_archivo}"
+				dataframe.to_excel(write_root, index=False)
+		except:
+			print(nombre_archivo)
 
 def procesar_subtotales(ruta_global):
-    ruta_catalogos = "/media/sf_Y_DRIVE/Homologacion/Catalogos Programas/"
+    ruta_catalogos = "/home/kaliuser/Documentos/diiestadistica/"
     ruta_programas = f"{ruta_catalogos}/programas.xlsx"
     ruta_unidades = f"{ruta_catalogos}/unidades_academicas.xlsx"
     ruta_subtotales = f"{ruta_global}/subtotales"
@@ -97,8 +120,8 @@ def procesar_subtotales(ruta_global):
     carpetas=["sub_totales_unidad","sub_totales_rama","totales"]
     eliminar_xlsx_vacios(ruta_subtotales)
     homologar_subtotales(ruta_subtotales,ruta_programas,ruta_unidades)
-    #crear_subdirectorios(ruta_subtotales, carpetas)
-    #sub_totales_unidad(ruta_global)
-    #sub_totales_rama(ruta_global)
-    #sub_totales_total(ruta_global)
+    crear_subdirectorios(ruta_subtotales, carpetas)
+    sub_totales_unidad(ruta_global)
+    sub_totales_rama(ruta_global)
+    sub_totales_total(ruta_global)
 

@@ -98,7 +98,7 @@ def procesamiento_aplanamiento(ruta_periodo):
 def procesamiento_limpieza(ruta_periodo):
 	ruta_aplanada = f"{ruta_periodo}/archivos_aplanados"
 	ruta_homo = f"{ruta_periodo}/archivos_homologados"
-	ruta_catalogos = "/media/sf_Y_DRIVE/Homologacion/Catalogos Programas/"
+	ruta_catalogos = "/home/kaliuser/Documentos/diiestadistica/"
 	ruta_programas = f"{ruta_catalogos}/programas.xlsx"
 	ruta_unidades = f"{ruta_catalogos}/unidades_academicas.xlsx"
 	programas = pd.read_excel(ruta_programas)
