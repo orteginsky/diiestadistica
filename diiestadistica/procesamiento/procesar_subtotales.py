@@ -66,10 +66,8 @@ def homologar_subtotales(ruta_subtotales,ruta_unidades):
 		except:
 			print(nombre_archivo)
 
-def sub_totales_unidad(ruta_global):
+def sub_totales_unidad(ruta_global, ruta_unidades, ruta_programas):
 	ruta_catalogos = "/home/kaliuser/Documentos/diiestadistica/"
-	ruta_programas = f"{ruta_catalogos}/programas.xlsx"
-	ruta_unidades = f"{ruta_catalogos}/unidades_academicas.xlsx"
 	programas = pd.read_excel(ruta_programas)
 	unidades = pd.read_excel(ruta_unidades)
 	lista_filtro = [col for col in unidades.columns]
@@ -92,10 +90,8 @@ def sub_totales_unidad(ruta_global):
 			print(nombre_archivo)
 
 
-def sub_totales_rama(ruta_global):
+def sub_totales_rama(ruta_global, ruta_unidades, ruta_programas):
 	ruta_catalogos = "/home/kaliuser/Documentos/diiestadistica/"
-	ruta_programas = f"{ruta_catalogos}/programas.xlsx"
-	ruta_unidades = f"{ruta_catalogos}/unidades_academicas.xlsx"
 	programas = pd.read_excel(ruta_programas)
 	unidades = pd.read_excel(ruta_unidades)
 	lista_filtro = [col for col in unidades.columns if col not in ['Rama_intranet']]
@@ -118,10 +114,8 @@ def sub_totales_rama(ruta_global):
 		except:
 			print(nombre_archivo)
 
-def sub_totales_total(ruta_global):
+def sub_totales_total(ruta_global, ruta_unidades, ruta_programas):
 	ruta_catalogos = "/home/kaliuser/Documentos/diiestadistica/"
-	ruta_programas = f"{ruta_catalogos}/programas.xlsx"
-	ruta_unidades = f"{ruta_catalogos}/unidades_academicas.xlsx"
 	programas = pd.read_excel(ruta_programas)
 	unidades = pd.read_excel(ruta_unidades)
 	lista_filtro = [col for col in unidades.columns]
@@ -154,7 +148,7 @@ def procesar_subtotales(ruta_global):
     eliminar_xlsx_vacios(ruta_subtotales)
     homologar_subtotales(ruta_subtotales,ruta_unidades)
     crear_subdirectorios(ruta_subtotales, carpetas)
-    sub_totales_unidad(ruta_global)
-    sub_totales_rama(ruta_global)
-    sub_totales_total(ruta_global)
+    sub_totales_unidad(ruta_global, ruta_unidades, ruta_programas)
+    sub_totales_rama(ruta_global, ruta_unidades, ruta_programas)
+    sub_totales_total(ruta_global, ruta_unidades, ruta_programas)
 

@@ -124,3 +124,26 @@ def comprimir_archivo(ruta_archivo):
 
     with zipfile.ZipFile(ruta_zip, 'w', zipfile.ZIP_DEFLATED) as zipf:
         zipf.write(ruta_archivo, arcname=nombre)
+
+def comprimir_carpeta(ruta_carpeta, nombre_zip='informes.zip'):
+    """
+    Comprime todos los archivos de una carpeta en un solo archivo zip.
+    
+    Parámetros:
+    ruta_carpeta (str): Ruta a la carpeta que contiene los archivos.
+    nombre_zip (str): Nombre del archivo zip a crear (opcional).
+    
+    Retorna:
+    str: Ruta completa del archivo zip creado.
+    """
+    ruta_zip = os.path.join(ruta_carpeta, nombre_zip)
+
+    with zipfile.ZipFile(ruta_zip, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for carpeta_actual, _, archivos in os.walk(ruta_carpeta):
+            for archivo in archivos:
+                if archivo == nombre_zip:
+                    continue  # Evita comprimir el archivo zip dentro de sí mismo
+                ruta_completa = os.path.join(carpeta_actual, archivo)
+                ruta_relativa = os.path.relpath(ruta_completa, ruta_carpeta)
+                zipf.write(ruta_completa, arcname=ruta_relativa)
+

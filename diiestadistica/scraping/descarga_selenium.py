@@ -175,7 +175,4 @@ def descarga_selenium(año_inicio = 2023, semestre = 2, download_path = "C:/"):
 #_________________________T O D O ____ B I E N______A R R I B A_____________
 
 if __name__ == "__main__":
-    from ..gui.seleccion_archivos import seleccionar_carpeta
-    download_path=seleccionar_carpeta()
-    print(f"Ruta seleccionada: {download_path}")
-    descarga_selenium(download_path=download_path)
+    descarga_selenium()

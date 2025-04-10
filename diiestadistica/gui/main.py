@@ -6,6 +6,8 @@ from ..procesamiento.procesamiento_maestro import procesamiento_aplanamiento
 from ..procesamiento.procesamiento_maestro import procesamiento_limpieza
 from ..procesamiento.procesar_subtotales import procesar_subtotales
 from ..informes.arch_maestro import informes_mapre
+from ..informes.errores import informe_errores
+from ..procesamiento.procesar_subtotales import procesar_subtotales
 
 from .ventana_base import ventana_base
 from .ventana_base import agregar_boton
@@ -77,12 +79,16 @@ def homologar_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
     procesamiento_limpieza(ruta_base)
 
+def procesar_subtotales_gui(seleccion_textbox, ciclos, periodos):
+    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    procesar_subtotales(ruta_base)
 
 def archivo_maestro_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
     informes_mapre(ruta_base)
 def errores_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    informe_errores(ruta_base)
 def mapre_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
 def zip_gui(seleccion_textbox, ciclos, periodos):
@@ -195,11 +201,32 @@ crudo_Generar = tk.Button(
 crudo_Generar.grid(row=0, column=1)
 
 labels_definidos = [
-    tk.Label(frame_procesamiento, text="Direccionando archivos", font=("Arial", 14)),
-    tk.Label(frame_procesamiento, text="Generando Nombres", font=("Arial", 14)),
-    tk.Label(frame_procesamiento, text="Depurando y limpiando archivos", font=("Arial", 14)),
-    tk.Label(frame_procesamiento, text="Homologando Archivos", font=("Arial", 14))
-]
+    tk.Label(
+        frame_procesamiento,
+        text="Direccionando archivos",
+        font=("Arial", 14)
+        ),
+    tk.Label(
+        frame_procesamiento,
+        text="Generando Nombres",
+        font=("Arial", 14)
+        ),
+    tk.Label(
+        frame_procesamiento,
+        text="Depurando y limpiando archivos",
+        font=("Arial", 14)
+        ),
+    tk.Label(
+        frame_procesamiento,
+        text="Homologando Archivos",
+        font=("Arial", 14)
+        ),
+    tk.Label(
+        frame_procesamiento,
+        text="Procesar subtotales",
+        font=("Arial", 14)
+        )
+    ]
 
 labels = []
 for i, label in enumerate(labels_definidos):
@@ -214,7 +241,8 @@ funciones = [
     (mover_archivos_gui,[seleccion_textbox, ciclos, periodos, True]),
     (renombrar_archivos_gui,[seleccion_textbox, ciclos, periodos, True]),
     (depurar_gui,[seleccion_textbox, ciclos, periodos]),
-    (homologar_gui,[seleccion_textbox, ciclos, periodos])
+    (homologar_gui,[seleccion_textbox, ciclos, periodos]),
+    (procesar_subtotales_gui,[seleccion_textbox, ciclos, periodos])
     ]
 
 crudo_regresar.config(
@@ -273,7 +301,6 @@ for i, label in enumerate(labels_definidos_generacion):
     status_label = tk.Label(frame_generacion, text="Esperando...")
     status_label.grid(row=i+1, column=1, padx=10)
     labels_generacion.append(status_label)
-
 
 generacion_regresar.config(command=lambda: ir_a_pestaña_n(4))
 
