@@ -2,12 +2,15 @@ from ..utils.archivo_utils import renombrar_archivos
 from ..utils.os_utils import limpiar_descargas
 from ..utils.os_utils import crear_directorio
 from ..utils.os_utils import mover_archivos
+from ..utils.os_utils import comprimir_carpeta
 from ..procesamiento.procesamiento_maestro import procesamiento_aplanamiento
 from ..procesamiento.procesamiento_maestro import procesamiento_limpieza
 from ..procesamiento.procesar_subtotales import procesar_subtotales
+from ..procesamiento.procesar_subtotales import procesar_subtotales
 from ..informes.arch_maestro import informes_mapre
 from ..informes.errores import informe_errores
-from ..procesamiento.procesar_subtotales import procesar_subtotales
+from ..informes.mapre import mapre
+from ..conexion.email import enviar_correo
 
 from .ventana_base import ventana_base
 from .ventana_base import agregar_boton
@@ -50,13 +53,11 @@ def generar_ruta(seleccion_textbox, ciclos, periodos):
     ruta_base = f"{carpeta}/periodo_{ciclo}_{periodo}"
     return ruta_base
 
-
 def depurar(ruta_base, bolean = False):
     if bolean:
         print(f"se depuro en{ruta_base}")
     else:
         print("se depuro")
-
 
 def crear_directorio_gui(seleccion_textbox, ciclos, periodos, pestaña):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
@@ -86,13 +87,26 @@ def procesar_subtotales_gui(seleccion_textbox, ciclos, periodos):
 def archivo_maestro_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
     informes_mapre(ruta_base)
+
 def errores_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
     informe_errores(ruta_base)
+
 def mapre_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    mapre(ruta_base)
+
 def zip_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    ruta_informes = f"{ruta_base}/reportes"
+    comprimir_carpeta(ruta_informes)
+
+def enviar_correo_gui():
+    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    ruta_zip = f"{ruta_base}/reportes/ruta_zip"
+    lista_correos=['luisortegar99@gmail.com','jalcaide@ipn.mx','lortegar1401@alumno.ipn.mx']
+    for correo in lista_correos:
+        enviar_correo(ruta_zip, correo)
 
 def ejecutar_funciones(frame, labels, funciones, idx=0):
     """
@@ -235,8 +249,6 @@ for i, label in enumerate(labels_definidos):
     status_label.grid(row=i+1, column=1, padx=10)
     labels.append(status_label)
 
-
-
 funciones = [
     (mover_archivos_gui,[seleccion_textbox, ciclos, periodos, True]),
     (renombrar_archivos_gui,[seleccion_textbox, ciclos, periodos, True]),
@@ -321,6 +333,7 @@ frame_enviar = ttk.Frame(notebook)
 enviar_regresar = agregar_boton(frame_enviar,"Regresar")
 enviar_regresar.config(command=lambda: ir_a_pestaña_n(5))
 enviar_Generar = agregar_boton(frame_enviar,"Enviar Informes")
+enviar_Generar.config(command = lambda: enviar_correo_gui(seleccion_textbox, ciclos, periodos))
 notebook.add(frame_enviar, text="Enviar Informes")
 
 estilizar_pestañas(notebook)

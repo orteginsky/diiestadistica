@@ -142,7 +142,7 @@ def comprimir_carpeta(ruta_carpeta, nombre_zip='informes.zip'):
         for carpeta_actual, _, archivos in os.walk(ruta_carpeta):
             for archivo in archivos:
                 if archivo == nombre_zip:
-                    continue  # Evita comprimir el archivo zip dentro de sí mismo
+                    continue
                 ruta_completa = os.path.join(carpeta_actual, archivo)
                 ruta_relativa = os.path.relpath(ruta_completa, ruta_carpeta)
                 zipf.write(ruta_completa, arcname=ruta_relativa)

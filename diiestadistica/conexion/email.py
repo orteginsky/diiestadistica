@@ -7,7 +7,7 @@ import os
 
 def enviar_correo(
         ruta_archivo,
-        correo_destinatario = "luisortegar99@gmail.com",
+        correo_destinatario = "jalcaide@ipn.mx",
         correo_remitente = "diiestadisticabasica@gmail.com",
         contraseña_app = "qfdzcsnfkkwwirbg"
         ):
