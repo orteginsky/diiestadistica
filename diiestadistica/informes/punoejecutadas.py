@@ -54,15 +54,34 @@ def ordenar_y_agrupar_columna_en_libro(workbook: Workbook, nombre_columna: str, 
             ws.merge_cells(f"{col_letter}{fila_inicio}:{col_letter}{ws.max_row}")
 
 
-def mapre(ruta_global):
+def anti_join(df1, df2, left_on, right_on):
+    # Hacemos un merge para encontrar las coincidencias
+    filas_repetidas = pd.merge(
+        df1,
+        df2[right_on],
+        left_on=left_on,
+        right_on=right_on,
+        how='inner'
+    )
+
+    # Convertimos a tuplas si son múltiples columnas
+    index_df1 = df1[left_on].apply(tuple, axis=1) if isinstance(left_on, list) else df1[left_on]
+    index_repetidas = filas_repetidas[left_on].apply(tuple, axis=1) if isinstance(left_on, list) else filas_repetidas[left_on]
+
+    # Obtenemos lo que no está en el merge
+    condicion = ~index_df1.isin(index_repetidas)
+
+    return df1[condicion].reset_index(drop=True)
+
+def pu(ruta_global):
     """
     Genera un libro de Excel con una hoja por cada valor único en la 'Indice'.
-    En cada hoja realiza las operaciones de agrupación, pivotado y creación de columnas adicionales.
+    En cada hoja realiza las una intersección con el catalogo de programas y unidades.
     Aplica formato a los encabezados.
     """
     ruta_reportes = f"{ruta_global}/reportes"
     ruta_archivo_maestro = f"{ruta_reportes}/archivo_maestro.xlsx"
-    ruta_salida = f"{ruta_reportes}/mapre.xlsx"
+    ruta_salida = f"{ruta_reportes}/programas_no_reportados.xlsx"
     #ruta_pu = 
     #pu = pd.read_excel(ruta_pu)
     #
@@ -73,37 +92,17 @@ def mapre(ruta_global):
         hojas_generadas = []
 
         with pd.ExcelWriter(ruta_salida, engine='openpyxl', mode='w') as writer:
-            if 'Grupos' in indice:
-                indice_dataframe = dataframe[dataframe['Indice'] == 'Grupos']
-                agrupacion = indice_dataframe.groupby(['Nivel', 'Sexo'], as_index=False)['Datos'].sum()
-                agrupacion = agrupacion.pivot(index='Nivel', columns='Sexo', values='Datos').reset_index()
-                agrupacion.to_excel(writer, sheet_name='Matricula Global', index=False)
-                hojas_generadas.append('Matricula Global')
-
             for seleccion in indice:
                 indice_dataframe = dataframe[dataframe['Indice'] == seleccion]
-                if seleccion == 'Egresados':
-                    if (len(indice_dataframe['Sexo'].unique()) >= 2):
-                        agrupacion = indice_dataframe.groupby(['Nivel','Sexo'], as_index=False)['Datos'].sum()
-                        agrupacion = agrupacion.pivot(index=['Nivel'], columns='Sexo', values='Datos').reset_index()
-                        agrupacion['Total'] = agrupacion.get('Hombres', 0).fillna(0) + agrupacion.get('Mujeres', 0).fillna(0)
+                agrupacion = indice_dataframe.groupby(['Unidad.Academica','Programa'], as_index=False)['Datos'].sum()
+                agrupacion = agrupacion[agrupacion['Datos']!=0]
+                # hacer un anti join de PU - agrupacion
 
-                        # Evita nombres de hoja inválidos
-                        nombre_hoja = re.sub(r'[\[\]\*\?\/\\]', '', seleccion)[:31]
-                        agrupacion.to_excel(writer, sheet_name=nombre_hoja, index=False)
-                        hojas_generadas.append(nombre_hoja)
-                else:
-                    if len(indice_dataframe['Sexo'].unique()) >= 2 and len(indice_dataframe['Concepto'].unique()) >= 1:
-                        agrupacion = indice_dataframe.groupby(['Nivel', 'Concepto', 'Sexo'], as_index=False)['Datos'].sum()
-                        agrupacion = agrupacion.pivot(index=['Nivel', 'Concepto'], columns='Sexo', values='Datos').reset_index()
-                        agrupacion['Total'] = agrupacion.get('Hombres', 0).fillna(0) + agrupacion.get('Mujeres', 0).fillna(0)
-
-                        # Evita nombres de hoja inválidos
-                        nombre_hoja = re.sub(r'[\[\]\*\?\/\\]', '', seleccion)[:31]
-                        agrupacion.to_excel(writer, sheet_name=nombre_hoja, index=False)
-                        hojas_generadas.append(nombre_hoja)
+                # Evita nombres de hoja inválidos
+                nombre_hoja = re.sub(r'[\[\]\*\?\/\\]', '', seleccion)[:31]
+                agrupacion.to_excel(writer, sheet_name=nombre_hoja, index=False)
+                hojas_generadas.append(nombre_hoja)
                 
-
         # Aplicar estilos a los encabezados
         wb = load_workbook(ruta_salida)
         fill = PatternFill(start_color='5A1236', end_color='5A1236', fill_type='solid')
@@ -116,11 +115,6 @@ def mapre(ruta_global):
                 cell.fill = fill
                 cell.font = font
                 cell.alignment = align
-
-        orden = ['Medio Superior', 'Superior', 'Posgrado']
-        ordenar_y_agrupar_columna_en_libro(wb, 'Nivel', orden)
-        wb.save(ruta_salida)
-        
 
     except Exception as e:
         print(f"Se produjo un error: {e}")
