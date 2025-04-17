@@ -6,15 +6,14 @@ from openpyxl.workbook.workbook import Workbook
 
 import pandas as pd
 import re
+import os
 
-
-def ordenar_y_agrupar_columna_en_libro(workbook: Workbook, nombre_columna: str, orden_deseado: list):
+def ordenar_y_agrupar_columna_en_libro(workbook: Workbook, nombre_columna: str):
     """
     Ordena y agrupa por una columna específica en todas las hojas de un Workbook de openpyxl.
 
     :param workbook: Objeto Workbook cargado con openpyxl
     :param nombre_columna: Nombre de la columna a ordenar y agrupar
-    :param orden_deseado: Lista con el orden deseado
     """
     for ws in workbook.worksheets:
         # Obtener encabezados
@@ -28,9 +27,7 @@ def ordenar_y_agrupar_columna_en_libro(workbook: Workbook, nombre_columna: str, 
 
         # Leer datos (sin encabezado)
         datos = list(ws.iter_rows(min_row=2, max_row=ws.max_row, max_col=ws.max_column, values_only=True))
-
-        # Ordenar por el orden deseado
-        datos.sort(key=lambda fila: orden_deseado.index(fila[col_idx - 1]) if fila[col_idx - 1] in orden_deseado else float('inf'))
+        datos.sort(key=lambda fila: fila[col_idx-1])
 
         # Reescribir los datos ordenados
         for i, fila in enumerate(datos, start=2):
@@ -54,7 +51,104 @@ def ordenar_y_agrupar_columna_en_libro(workbook: Workbook, nombre_columna: str, 
             ws.merge_cells(f"{col_letter}{fila_inicio}:{col_letter}{ws.max_row}")
 
 
-def anti_join(df1, df2, left_on, right_on):
+def anti_join(df1, df2, on):
+    filas_repetidas = pd.merge(df1, df2[on], on=on, how='inner')
+    condicion = ~df1.set_index(on).index.isin(filas_repetidas.set_index(on).index)
+    return df1.loc[condicion].reset_index(drop=True)
+
+def extraer_anio_de_periodo(periodo: str) -> int:
+    """
+    Extrae el año correspondiente de un string con formato 'periodo_XXXX-XXXX+1_Y'.
+    Devuelve el primer o segundo año según el valor del semestre Y.
+
+    :param periodo: String del tipo 'periodo_2024-2025_2'
+    :return: Año como entero (ej. 2025)
+    """
+    try:
+        base, semestre = periodo.split('_')[1], periodo.split('_')[2]
+        anio_inicio, anio_fin = map(int, base.split('-'))
+        return anio_fin if semestre == '2' else anio_inicio
+    except Exception as e:
+        raise ValueError(f"Formato inválido del periodo: {periodo}. Error: {e}")
+
+def filtrar_por_anio_disponible(df, columna_anio: str, anio: int):
+    """
+    Filtra el DataFrame por el año en la columna especificada.
+    Si el año no está presente, intenta con el año anterior hasta encontrar coincidencias.
+
+    :param df: DataFrame de pandas
+    :param columna_anio: Nombre de la columna que contiene los años
+    :param anio: Año base a buscar
+    :return: DataFrame filtrado con el primer año encontrado hacia atrás
+    """
+    while anio >= df[columna_anio].min():
+        df_filtrado = df[df[columna_anio] == anio]
+        if not df_filtrado.empty:
+            return df_filtrado
+        anio -= 1
+    return pd.DataFrame()  # Si no se encuentra ningún año válido
+
+
+def pu(ruta_global):
+    """
+    Genera un libro de Excel con una hoja por cada valor único en la 'Indice'.
+    En cada hoja realiza las una intersección con el catalogo de programas y unidades.
+    Aplica formato a los encabezados.
+    """
+    ruta_reportes = f"{ruta_global}/reportes"
+    ruta_archivo_maestro = f"{ruta_reportes}/archivo_maestro.xlsx"
+    ruta_salida = f"{ruta_reportes}/programas_no_reportados.xlsx"
+    ruta_pu = "/home/kaliuser/Documentos/diiestadistica/historico.xlsx"
+    pu = pd.read_excel(ruta_pu)
+    base_ruta = os.path.basename(ruta_global)
+    anio_objetivo = extraer_anio_de_periodo(base_ruta)
+    pu = filtrar_por_anio_disponible(pu,"ano",anio_objetivo)
+    try:
+        dataframe = pd.read_excel(ruta_archivo_maestro)
+        indice = dataframe['Indice'].unique()
+        hojas_generadas = []
+
+        with pd.ExcelWriter(ruta_salida, engine='openpyxl', mode='w') as writer:
+            for seleccion in indice:
+                indice_dataframe = dataframe[dataframe['Indice'] == seleccion]
+                agrupacion = indice_dataframe.groupby(['Siglas','Nombre_Programa','Modalidad'], as_index=False)['Datos'].sum()
+                agrupacion = agrupacion[agrupacion['Datos']!=0]
+                # hacer un anti join de PU - agrupacion
+                npu = anti_join(pu,agrupacion,['Siglas','Nombre_Programa','Modalidad'])
+
+                # Evita nombres de hoja inválidos
+                nombre_hoja = re.sub(r'[\[\]\*\?\/\\]', '', seleccion)[:31]
+                npu.to_excel(writer, sheet_name=nombre_hoja, index=False)
+                hojas_generadas.append(nombre_hoja)
+                
+        # Aplicar estilos a los encabezados
+        wb = load_workbook(ruta_salida)
+        fill = PatternFill(start_color='5A1236', end_color='5A1236', fill_type='solid')
+        font = Font(color='FFFFFF', bold=True, size=12)
+        align = Alignment(horizontal='center', vertical='center')
+
+        for hoja in hojas_generadas:
+            ws = wb[hoja]
+            for cell in ws[1]:
+                cell.fill = fill
+                cell.font = font
+                cell.alignment = align
+
+        ordenar_y_agrupar_columna_en_libro(wb, 'Siglas')
+        wb.save(ruta_salida)
+        
+    except Exception as e:
+        print(f"Se produjo un error: {e}")
+
+
+"""import pandas as pd
+
+ruta_pu = "/home/kaliuser/Documentos/diiestadistica/historico.xlsx"
+
+pu = pd.read_excel(ruta_pu)
+print(pu.columns)"""
+
+"""def anti_join(df1, df2, left_on, right_on):
     # Hacemos un merge para encontrar las coincidencias
     filas_repetidas = pd.merge(
         df1,
@@ -71,50 +165,4 @@ def anti_join(df1, df2, left_on, right_on):
     # Obtenemos lo que no está en el merge
     condicion = ~index_df1.isin(index_repetidas)
 
-    return df1[condicion].reset_index(drop=True)
-
-def pu(ruta_global):
-    """
-    Genera un libro de Excel con una hoja por cada valor único en la 'Indice'.
-    En cada hoja realiza las una intersección con el catalogo de programas y unidades.
-    Aplica formato a los encabezados.
-    """
-    ruta_reportes = f"{ruta_global}/reportes"
-    ruta_archivo_maestro = f"{ruta_reportes}/archivo_maestro.xlsx"
-    ruta_salida = f"{ruta_reportes}/programas_no_reportados.xlsx"
-    #ruta_pu = 
-    #pu = pd.read_excel(ruta_pu)
-    #
-
-    try:
-        dataframe = pd.read_excel(ruta_archivo_maestro)
-        indice = dataframe['Indice'].unique()
-        hojas_generadas = []
-
-        with pd.ExcelWriter(ruta_salida, engine='openpyxl', mode='w') as writer:
-            for seleccion in indice:
-                indice_dataframe = dataframe[dataframe['Indice'] == seleccion]
-                agrupacion = indice_dataframe.groupby(['Unidad.Academica','Programa'], as_index=False)['Datos'].sum()
-                agrupacion = agrupacion[agrupacion['Datos']!=0]
-                # hacer un anti join de PU - agrupacion
-
-                # Evita nombres de hoja inválidos
-                nombre_hoja = re.sub(r'[\[\]\*\?\/\\]', '', seleccion)[:31]
-                agrupacion.to_excel(writer, sheet_name=nombre_hoja, index=False)
-                hojas_generadas.append(nombre_hoja)
-                
-        # Aplicar estilos a los encabezados
-        wb = load_workbook(ruta_salida)
-        fill = PatternFill(start_color='5A1236', end_color='5A1236', fill_type='solid')
-        font = Font(color='FFFFFF', bold=True, size=12)
-        align = Alignment(horizontal='center', vertical='center')
-
-        for hoja in hojas_generadas:
-            ws = wb[hoja]
-            for cell in ws[1]:
-                cell.fill = fill
-                cell.font = font
-                cell.alignment = align
-
-    except Exception as e:
-        print(f"Se produjo un error: {e}")
+    return df1[condicion].reset_index(drop=True)"""
