@@ -48,23 +48,22 @@ from .seleccionar_opcion import seleccionar_opcion_combo
 from .credenciales import credenciales
 
 
-def descarga_selenium(año_inicio = 2023, semestre = 2, download_path = "C:/"):
-    """
-    # Configurar opciones de Chrome
+def descarga_selenium(
+        año_inicio = 2023,
+        semestre = 2,
+        download_path = "/home/kaliuser/Documentos/prueba"):
+    #"""
+    # Configurar las opciones de Chrome
     chrome_options = Options()
     prefs = {
         "download.default_directory": download_path,
         "download.prompt_for_download": False,
         "download.directory_upgrade": True,
-        "safebrowsing.enabled": False
+        "safebrowsing.enabled": True
     }
-
     chrome_options.add_experimental_option("prefs", prefs)
-    prefs["profile.default_content_setting_values.automatic_downloads"] = 1
-    
-    # Configura el navegador
     driver = webdriver.Chrome(options=chrome_options)
-    """
+    #"""
 
     # Crear lista de conceptos que se van a descargar
     conceptos = ['Aprovechamiento Escolar por Sexo',
@@ -74,7 +73,7 @@ def descarga_selenium(año_inicio = 2023, semestre = 2, download_path = "C:/"):
                 'Matrícula Inscrita Nivel Posgrado',
                 'Matrícula Inscrita Por Grupos De Edad',
                 'Titulación']
-    driver = webdriver.Chrome()
+    #driver = webdriver.Chrome()
     # Ingresa a la página correspondiente e ingresa las credenciales
     driver = credenciales(driver)
 

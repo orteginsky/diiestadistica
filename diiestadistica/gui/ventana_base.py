@@ -54,7 +54,7 @@ def reemplazar_ventana(ventana_actual,titulo,subtitulo):
     ventana = ventana_base(titulo,subtitulo)
     return ventana
 
-def activar_descarga_intranet(ciclo,periodo):
+def activar_descarga_intranet(ciclo,periodo,download_path):
     anio_actual = datetime.now().year
     mes_actual = datetime.now().month
     anio_coincidencia = re.search(r"\d+", ciclo)
@@ -64,7 +64,7 @@ def activar_descarga_intranet(ciclo,periodo):
             anio_inicio = int(anio_coincidencia.group())
             semestre_inicio = int(periodo_coincidencia.group())
             if (anio_inicio!=anio_actual or (mes_actual>=8 and semestre_inicio==1 and anio_inicio==anio_actual)):
-                descarga_selenium(anio_inicio,semestre_inicio)
+                descarga_selenium(anio_inicio,semestre_inicio,download_path)
             else:
                 print("No esta disponible aun la información")
                 return

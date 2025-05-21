@@ -35,4 +35,3 @@ def credenciales(driver,d_usuario="cglara",d_contraseña="ZyK8nEEA"):
     except:
         print("Se produjo un Error")
         return(driver)
-        

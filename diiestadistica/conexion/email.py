@@ -1,16 +1,26 @@
 #qfdz csnf kkww irbg
-import smtplib
+from openpyxl import load_workbook
+from openpyxl.styles import PatternFill, Font, Alignment
+from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.worksheet import Worksheet
+from openpyxl.workbook.workbook import Workbook
 from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+
+
+import smtplib
 import os
 
 def enviar_correo(
-        ruta_archivo,
-        correo_destinatario = "jalcaide@ipn.mx",
+        ruta_carpeta,
+        #correo_destinatario = "jalcaide@ipn.mx",
+        correo_destinatario = "luisortegar99@gmail.com",
         correo_remitente = "diiestadisticabasica@gmail.com",
         contraseña_app = "qfdzcsnfkkwwirbg"
         ):
+    ruta_archivo = f"{ruta_carpeta}/informes.zip"
+    ruta_tabla = f"{ruta_carpeta}/archivo_maestro.xlsx"
     ruta_actual = os.path.dirname(os.path.abspath(__file__))
     ruta_firma = os.path.join(ruta_actual, "firma.html")
 
@@ -24,7 +34,7 @@ def enviar_correo(
 
     # Destinatario y mensaje
     asunto = "Matricula Preeliminar"
-    cuerpo = "Hola mi estimado ese"
+    cuerpo = "Hola"
 
     # Crear mensaje
     mensaje = MIMEMultipart()
