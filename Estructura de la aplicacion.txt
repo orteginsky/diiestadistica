@@ -34,7 +34,6 @@ diiestadistica/
 │   ├── ejemplo_reporte.py
 │
 │── requirements.txt            # Lista de dependencias necesarias
-│── setup.py                    # Empaquetado de la librería
 │── README.md                   # Descripción del proyecto
 │── .gitignore                  # Archivos a ignorar en Git
 

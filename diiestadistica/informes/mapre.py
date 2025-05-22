@@ -77,6 +77,14 @@ def mapre(ruta_global):
                 indice_dataframe = dataframe[dataframe['Indice'] == 'Grupos']
                 agrupacion = indice_dataframe.groupby(['Nivel', 'Sexo'], as_index=False)['Datos'].sum()
                 agrupacion = agrupacion.pivot(index='Nivel', columns='Sexo', values='Datos').reset_index()
+                agrupacion['Total'] = agrupacion.get('Hombres', 0).fillna(0) + agrupacion.get('Mujeres', 0).fillna(0)
+                total_row = pd.DataFrame({
+                    "Nivel": ["Total"],
+                    "Hombres": [agrupacion["Hombres"].sum()],
+                    "Mujeres": [agrupacion["Mujeres"].sum()],
+                    "Total": [agrupacion["Total"].sum()]
+                })
+                agrupacion = pd.concat([agrupacion, total_row], ignore_index=True)
                 agrupacion.to_excel(writer, sheet_name='Matricula Global', index=False)
                 hojas_generadas.append('Matricula Global')
 
