@@ -6,8 +6,8 @@ import os
 
 
 def informes_mapre(ruta_carpeta):
-    ruta_homo = f"{ruta_carpeta}/archivos_homologados"
-    ruta_informe = f"{ruta_carpeta}/reportes/archivo_maestro.xlsx"
+    ruta_homo = os.path.normpath(os.path.join(ruta_carpeta,"archivos_homologados"))
+    ruta_informe =  os.path.normpath(os.path.join(os.path.join(ruta_carpeta,"reportes"),"archivo_maestro.xlsx") )
     archivos_xlsx = [f for f in os.listdir(ruta_homo) if f.endswith(".xlsx")]
     
     if not archivos_xlsx:

@@ -31,36 +31,37 @@ Notas:
     
 - Verificar las rutas de los archivos antes de ejecutar el código.
 """
+from diiestadistica.scraping.seleccionar_opcion import seleccionar_opcion, seleccionar_opcion_combo_descarga
+from diiestadistica.scraping.seleccionar_opcion import seleccionar_opcion_egresados
+from diiestadistica.scraping.seleccionar_opcion import seleccionar_opcion_combo
+from diiestadistica.scraping.credenciales import credenciales
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from typing import Optional 
+
+
 import time
 import pandas as pd
-
-from .seleccionar_opcion import seleccionar_opcion, seleccionar_opcion_combo_descarga
-from .seleccionar_opcion import seleccionar_opcion_egresados
-from .seleccionar_opcion import seleccionar_opcion_combo
-from .credenciales import credenciales
-
+import os
 
 def descarga_selenium(
-        año_inicio = 2023,
-        semestre = 2,
-        download_path = "/home/kaliuser/Documentos/prueba"):
+        año_inicio: int = 2023,
+        semestre:int  = 2,
+        download_path: Optional[str] = None) -> Optional[webdriver.Chrome]:
     #"""
     # Configurar las opciones de Chrome
+    if not download_path:
+        download_path = os.path.join(os.path.expanduser("~"), "Downloads")
+    print(f"Archivos se descargarán en: {download_path}")
     chrome_options = Options()
     prefs = {
         "download.default_directory": download_path,
         "download.prompt_for_download": False,
         "download.directory_upgrade": True,
-        "safebrowsing.enabled": True
-    }
+        "safebrowsing.enabled": True,
+        }
     chrome_options.add_experimental_option("prefs", prefs)
     driver = webdriver.Chrome(options=chrome_options)
     #"""
@@ -174,4 +175,9 @@ def descarga_selenium(
 #_________________________T O D O ____ B I E N______A R R I B A_____________
 
 if __name__ == "__main__":
-    descarga_selenium()
+    from diiestadistica.gui.seleccion_archivos import seleccionar_carpeta
+    download_path = seleccionar_carpeta()
+    if download_path is not None:
+        descarga_selenium(download_path=download_path)
+    else:
+        descarga_selenium()

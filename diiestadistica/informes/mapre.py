@@ -4,9 +4,10 @@ from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.workbook.workbook import Workbook
 
+
 import pandas as pd
 import re
-
+import os
 
 def ordenar_y_agrupar_columna_en_libro(workbook: Workbook, nombre_columna: str, orden_deseado: list):
     """
@@ -60,9 +61,9 @@ def mapre(ruta_global):
     En cada hoja realiza las operaciones de agrupación, pivotado y creación de columnas adicionales.
     Aplica formato a los encabezados.
     """
-    ruta_reportes = f"{ruta_global}/reportes"
-    ruta_archivo_maestro = f"{ruta_reportes}/archivo_maestro.xlsx"
-    ruta_salida = f"{ruta_reportes}/mapre.xlsx"
+    ruta_reportes = os.path.normpath(os.path.join(ruta_global,"reportes"))
+    ruta_archivo_maestro = os.path.normpath(os.path.join(ruta_reportes,"archivo_maestro.xlsx"))
+    ruta_salida = os.path.normpath(os.path.join(ruta_reportes,"mapre.xlsx"))
     #ruta_pu = 
     #pu = pd.read_excel(ruta_pu)
     #

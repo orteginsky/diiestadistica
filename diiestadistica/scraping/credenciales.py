@@ -32,6 +32,6 @@ def credenciales(driver,d_usuario="cglara",d_contraseña="ZyK8nEEA"):
         # Espera a que el contenido dinámico se cargue
         time.sleep(2)
         return(driver)
-    except:
+    except Exception:
         print("Se produjo un Error")
         return(driver)

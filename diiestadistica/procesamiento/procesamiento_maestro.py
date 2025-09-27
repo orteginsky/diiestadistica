@@ -11,7 +11,6 @@ from .transformaciones import reorganizar_datos
 from .transformaciones import generar_columnas
 from .transformaciones import dividir_subtotales
 from .limpieza import limpiar_nombres_programas
-from .limpieza import capitalizar
 
 #funciones particulares
 from bs4 import BeautifulSoup
@@ -20,16 +19,21 @@ import pandas as pd
 import os
 import re
 
+
 def procesamiento_aplanamiento(ruta_periodo):
-	ruta_xml = f"{ruta_periodo}/archivos_originales"
-	ruta_aplanada = f"{ruta_periodo}/archivos_aplanados"
-	ruta_subtotales = f"{ruta_periodo}/subtotales"
+	ruta_xml = os.path.normpath(os.path.join(ruta_periodo,"archivos_originales"))
+	print(ruta_xml)
+	ruta_aplanada = os.path.normpath(os.path.join(ruta_periodo,"archivos_aplanados"))
+	ruta_subtotales = os.path.normpath(os.path.join(ruta_periodo,"subtotales"))
 	periodo = extraer_periodo(ruta_periodo)
-	periodo = re.sub("_","/",periodo)
+	if periodo is not None:
+		periodo = re.sub("_", "/", str(periodo))
+	else:
+		periodo = ""
 	for nombre_archivo in os.listdir(ruta_xml):
 		try:
 			if nombre_archivo.endswith("xls"):
-				ruta_archivo = f"{ruta_xml}/{nombre_archivo}"
+				ruta_archivo = os.path.normpath(os.path.join(ruta_xml,nombre_archivo))
 				with open(ruta_archivo, "r", encoding="latin-1") as archivo_html:
 					soup = BeautifulSoup(archivo_html, "html.parser")
 				soup_encabezados = soup.find("thead")
@@ -87,27 +91,30 @@ def procesamiento_aplanamiento(ruta_periodo):
 				datos_exp['Periodo'] = periodo
 				datos_exp, subtotales = dividir_subtotales(datos_exp)
 
-				ruta_guardar = f"{ruta_aplanada}/{nombre_archivo_guardar}.xlsx"
+				ruta_guardar = os.path.normpath(os.path.join(ruta_aplanada,f"{nombre_archivo_guardar}.xlsx"))
 				datos_exp.to_excel(ruta_guardar, index=False)
-				ruta_guardar_subtotales = f"{ruta_subtotales}/{nombre_archivo_guardar}.xlsx"
+				ruta_guardar_subtotales = os.path.normpath(os.path.join(ruta_subtotales,f"{nombre_archivo_guardar}.xlsx"))
 				subtotales.to_excel(ruta_guardar_subtotales, index=False)
 				
 		except:
 			print(nombre_archivo)
 
 def procesamiento_limpieza(ruta_periodo):
-	ruta_aplanada = f"{ruta_periodo}/archivos_aplanados"
-	ruta_homo = f"{ruta_periodo}/archivos_homologados"
-	ruta_catalogos = "/home/kaliuser/Documentos/diiestadistica/"
-	ruta_programas = f"{ruta_catalogos}/programas.xlsx"
-	ruta_unidades = f"{ruta_catalogos}/unidades_academicas.xlsx"
+	ruta_aplanada = os.path.normpath(os.path.join(ruta_periodo,"archivos_aplanados"))
+	ruta_homo = os.path.normpath(os.path.join(ruta_periodo,"archivos_homologados"))
+	ruta_catalogos = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+	ruta_programas = os.path.normpath(os.path.join(ruta_catalogos,"programas.xlsx"))
+	ruta_unidades = os.path.normpath(os.path.join(ruta_catalogos,"unidades_academicas.xlsx"))
+	print(ruta_catalogos)
+	print(ruta_programas)
+	print(ruta_unidades)
 	programas = pd.read_excel(ruta_programas)
 	unidades = pd.read_excel(ruta_unidades)
 	for nombre_archivo in os.listdir(ruta_aplanada):
 		try:
 			if nombre_archivo.endswith("xlsx"):
 				nombre_archivo_guardar = re.sub('.xlsx','',nombre_archivo)
-				ruta_archivo = f"{ruta_aplanada}/{nombre_archivo}"
+				ruta_archivo = os.path.normpath(os.path.join(ruta_aplanada,nombre_archivo))
 				dataframe = pd.read_excel(ruta_archivo)
 				if "Sexo" in dataframe.columns:
 					dataframe = dataframe[dataframe['Sexo']!='H..M']
@@ -172,7 +179,7 @@ def procesamiento_limpieza(ruta_periodo):
 
 				dataframe_final = pd.concat([duplicados, unicos], ignore_index=True)
 
-				ruta_homo_guardar = f"{ruta_homo}/{nombre_archivo_guardar}.xlsx"
+				ruta_homo_guardar = os.path.normpath(os.path.join(ruta_homo,f"{nombre_archivo_guardar}.xlsx"))
 				dataframe_final.to_excel(ruta_homo_guardar, index=False)
 		except:
 			print(nombre_archivo)

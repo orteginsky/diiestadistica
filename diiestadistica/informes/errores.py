@@ -9,19 +9,19 @@ def anti_join(df1, df2, on):
 
 
 def informe_errores(ruta_global,lista=['Datos']):
-    ruta_subtotales = f"{ruta_global}/subtotales"
-    ruta_errores = f"{ruta_global}/errores"
+    ruta_subtotales = os.path.normpath(os.path.join(ruta_global,"subtotales"))
+    ruta_errores = os.path.normpath(os.path.join(ruta_global,"errores"))
     lista_dataframes=[]
     nombre_hojas=[]
-    archivos = [f for f in os.listdir(ruta_subtotales) if f.endswith('.xlsx') and os.path.isfile(os.path.join(ruta_subtotales, f))]
-    carpetas = [d for d in os.listdir(ruta_subtotales) if os.path.isdir(os.path.join(ruta_subtotales, d))]
+    archivos = [f for f in os.listdir(ruta_subtotales) if f.endswith('.xlsx') and os.path.isfile(os.path.normpath(os.path.join(ruta_subtotales, f)))]
+    carpetas = [d for d in os.listdir(ruta_subtotales) if os.path.isdir(os.path.normpath(os.path.join(ruta_subtotales, d)))]
     for nombre_archivo in archivos:
-        ruta_total = os.path.join(ruta_subtotales,nombre_archivo)
+        ruta_total = os.path.normpath(os.path.join(ruta_subtotales,nombre_archivo))
         try:
             dataframe_base = pd.read_excel(ruta_total)
             for carpeta in carpetas:
-                ruta_carpeta = os.path.join(ruta_subtotales,carpeta)
-                ruta_anti = os.path.join(ruta_carpeta, nombre_archivo)
+                ruta_carpeta = os.path.normpath(os.path.join(ruta_subtotales,carpeta))
+                ruta_anti = os.path.normpath(os.path.join(ruta_carpeta, nombre_archivo))
                 if os.path.exists(ruta_anti):
                     dataframe = pd.read_excel(ruta_anti)
                     dataframe_base = anti_join(dataframe_base, dataframe, lista)
@@ -36,7 +36,8 @@ def informe_errores(ruta_global,lista=['Datos']):
             continue
     
     if lista_dataframes:
-        ruta_archivo_errores = f"{ruta_errores}/informe.xlsx"
+        ruta_archivo_errores = os.path.normpath(os.path.join(ruta_errores,"informe.xlsx"))
+        print(f"❌ Se encontraron errores, revisa el informe en: {ruta_archivo_errores}")
         with pd.ExcelWriter(ruta_archivo_errores, engine='openpyxl') as writer:
             for df, hoja in zip(lista_dataframes, nombre_hojas):
                 df.to_excel(writer, sheet_name=hoja, index=False)

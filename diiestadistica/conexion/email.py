@@ -1,9 +1,5 @@
 #qfdz csnf kkww irbg
-from openpyxl import load_workbook
-from openpyxl.styles import PatternFill, Font, Alignment
-from openpyxl.utils import get_column_letter
-from openpyxl.worksheet.worksheet import Worksheet
-from openpyxl.workbook.workbook import Workbook
+# jalc aide @ipn.mx
 from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -20,8 +16,8 @@ def enviar_correo(
         correo_remitente = "diiestadisticabasica@gmail.com",
         contraseña_app = "qfdzcsnfkkwwirbg"
         ):
-    ruta_archivo = f"{ruta_carpeta}/informes.zip"
-    ruta_tabla = f"{ruta_carpeta}/mapre.xlsx"
+    ruta_archivo = os.path.normpath(os.path.join(ruta_carpeta,"informes.zip"))
+    ruta_tabla = os.path.normpath(os.path.join(ruta_carpeta,"mapre.xlsx"))
     ruta_actual = os.path.dirname(os.path.abspath(__file__))
     ruta_firma = os.path.join(ruta_actual, "firma.html")
 

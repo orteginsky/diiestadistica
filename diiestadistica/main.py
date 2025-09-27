@@ -1,11 +1,9 @@
 from .utils.archivo_utils import renombrar_archivos
 from .utils.os_utils import limpiar_descargas
 from .utils.os_utils import crear_directorio
-from .utils.os_utils import mover_archivos
 from .utils.os_utils import comprimir_carpeta
 from .procesamiento.procesamiento_maestro import procesamiento_aplanamiento
 from .procesamiento.procesamiento_maestro import procesamiento_limpieza
-from .procesamiento.procesar_subtotales import procesar_subtotales
 from .procesamiento.procesar_subtotales import procesar_subtotales
 from .informes.arch_maestro import informes_mapre
 from .informes.errores import informe_errores
@@ -24,6 +22,7 @@ from .gui.ventana_base import boton_carpeta
 
 import tkinter as tk
 from tkinter import ttk
+import os
 
 def quitar():
     notebook.destroy()
@@ -42,18 +41,34 @@ def generar_ruta(seleccion_textbox, ciclos, periodos):
     carpeta = seleccion_textbox.get()
     ciclo = ciclos.get()
     periodo = periodos.get()
-    ruta_base = f"{carpeta}/periodo_{ciclo}_{periodo}"
+    ruta_base = os.path.normpath(os.path.join(carpeta, f"periodo_{ciclo}_{periodo}"))
+    print(ruta_base)
     return ruta_base
 
 def descargar(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    print(ruta_base)
     crear_directorio(ruta_base)
     ir_a_pestaña_n(2)
     ciclo = ciclos.get()
     periodo = periodos.get() 
-    print(ciclo,periodo)
-    download_path = f"{ruta_base}/archivos_originales"
-    activar_descarga_intranet(ciclo,periodo,download_path)
+    print(ciclo, periodo)
+    download_path = os.path.normpath(os.path.join(ruta_base, "archivos_originales"))
+    print(download_path)
+    activar_descarga_intranet(ciclo, periodo, download_path)
+
+def zip_gui(seleccion_textbox, ciclos, periodos):
+    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    ruta_informes = os.path.normpath(os.path.join(ruta_base, "reportes"))
+    comprimir_carpeta(ruta_informes)
+
+def enviar_correo_gui(seleccion_textbox, ciclos, periodos):
+    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    ruta_zip = os.path.normpath(os.path.join(ruta_base, "reportes"))
+    print(ruta_zip)
+    lista_correos = ['luisortegar99@gmail.com','lortegar1401@alumno.ipn.mx']
+    for correo in lista_correos:
+        enviar_correo(ruta_zip, correo)
 
 def depurar(ruta_base, bolean = False):
     if bolean:
@@ -89,18 +104,6 @@ def errores_gui(seleccion_textbox, ciclos, periodos):
 def mapre_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
     mapre(ruta_base)
-
-def zip_gui(seleccion_textbox, ciclos, periodos):
-    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
-    ruta_informes = f"{ruta_base}/reportes"
-    comprimir_carpeta(ruta_informes)
-
-def enviar_correo_gui():
-    ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
-    ruta_zip = f"{ruta_base}/reportes/ruta_zip"
-    lista_correos=['luisortegar99@gmail.com','lortegar1401@alumno.ipn.mx'] #'jalcaide@ipn.mx'
-    for correo in lista_correos:
-        enviar_correo(ruta_zip, correo)
 
 def ejecutar_funciones(frame, labels, funciones, idx=0):
     """

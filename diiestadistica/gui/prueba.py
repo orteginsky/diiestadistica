@@ -11,6 +11,8 @@ from .ventana_base import (
     activar_descarga_intranet, seleccionar_carpeta, agregar_textbox, boton_carpeta
 )
 
+import os
+
 # Funciones de control de interfaz
 def quitar():
     root.destroy()
@@ -33,7 +35,8 @@ def descargar(ciclos, periodos):
     activar_descarga_intranet(ciclos.get(), periodos.get())
 
 def generar_ruta(seleccion_textbox, ciclos, periodos):
-    return f"{seleccion_textbox.get()}/periodo_{ciclos.get()}_{periodos.get()}"
+    ruta = os.path.join(seleccion_textbox.get(), f"periodo_{ciclos.get()}_{periodos.get()}")
+    return ruta
 
 def crear_directorio_gui(seleccion_textbox, ciclos, periodos, pestaña):
     crear_directorio(generar_ruta(seleccion_textbox, ciclos, periodos))

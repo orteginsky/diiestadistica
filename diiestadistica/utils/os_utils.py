@@ -7,9 +7,12 @@ import zipfile
 def limpiar_descargas():
     # Detectar la carpeta de Descargas según el sistema operativo
     descarga_dir = ruta_descargas()
+    if descarga_dir is None:
+        print("No se pudo determinar la carpeta de Descargas.")
+        return
     # Recorrer todos los archivos y carpetas en Descargas
     for item in os.listdir(descarga_dir):
-        item_path = os.path.join(descarga_dir, item)
+        item_path = os.path.normpath(os.path.join(descarga_dir, item))
 
         try:
             if os.path.isfile(item_path) or os.path.islink(item_path):
@@ -24,20 +27,20 @@ def limpiar_descargas():
 
 def ruta_descargas():
     if platform.system() == "Windows":
-        if os.path.isdir(os.path.join(os.environ["USERPROFILE"], "Downloads")):
-            descarga_dir = os.path.join(os.environ["USERPROFILE"], "Downloads")
+        if os.path.isdir(os.path.normpath(os.path.join(os.environ["USERPROFILE"], "Downloads"))):
+            descarga_dir = os.path.normpath(os.path.join(os.environ["USERPROFILE"], "Downloads"))
             return descarga_dir
-        elif os.path.isdir(os.path.join(os.environ["USERPROFILE"], "Descargas")):
-            descarga_dir = os.path.join(os.environ["USERPROFILE"], "Descargas")
+        elif os.path.isdir(os.path.normpath(os.path.join(os.environ["USERPROFILE"], "Descargas"))):
+            descarga_dir = os.path.normpath((os.path.join(os.environ["USERPROFILE"], "Descargas")))
             return descarga_dir
         else:
             return
     else:
-        if os.path.isdir(os.path.join(os.path.expanduser("~"), "Downloads")):
-            descarga_dir = os.path.join(os.path.expanduser("~"), "Downloads")
+        if os.path.isdir(os.path.normpath(os.path.join(os.path.expanduser("~"), "Downloads"))):
+            descarga_dir = os.path.normpath(os.path.join(os.path.expanduser("~"), "Downloads"))
             return descarga_dir
-        elif os.path.isdir(os.path.join(os.path.expanduser("~"), "Descargas")):
-            descarga_dir = os.path.join(os.path.expanduser("~"), "Descargas")
+        elif os.path.isdir(os.path.normpath(os.path.join(os.path.expanduser("~"), "Descargas"))):
+            descarga_dir = os.path.normpath(os.path.join(os.path.expanduser("~"), "Descargas"))
             return descarga_dir
         else:
             return
@@ -64,7 +67,7 @@ def crear_directorio(ruta_base):
         os.makedirs(ruta_base, exist_ok=True)
         
         for sub in subdirectorios:
-            os.makedirs(os.path.join(ruta_base, sub), exist_ok=True)
+            os.makedirs(os.path.normpath(os.path.join(ruta_base, sub)), exist_ok=True)
 
         print(f"Directorios creados exitosamente en '{ruta_base}'.")
 
@@ -75,7 +78,7 @@ def crear_directorio(ruta_base):
 def mover_archivos(ruta_base, bolean = False):
 
     if bolean:
-        destino_final = f"{ruta_base}/archivos_originales"
+        destino_final = os.path.normpath(os.path.join(ruta_base, "archivos_originales"))
     else:
         destino_final = ruta_base
 
@@ -88,7 +91,7 @@ def mover_archivos(ruta_base, bolean = False):
         return
     
     # Verificar si la carpeta de "Descargas" existe
-    if not os.path.exists(path_descargas):
+    if path_descargas is None or not os.path.exists(path_descargas):
         print(f"La carpeta de 'Descargas' no existe: {path_descargas}")
         return
 
@@ -97,7 +100,7 @@ def mover_archivos(ruta_base, bolean = False):
 
     # Mover cada archivo a la carpeta de destino final
     for archivo in archivos:
-        ruta_origen = os.path.join(path_descargas, archivo)
+        ruta_origen = os.path.normpath(os.path.join(path_descargas, archivo))
         if os.path.isfile(ruta_origen):
             try:
                 shutil.move(ruta_origen, destino_final)
@@ -120,7 +123,7 @@ def extraer_periodo(ruta_directorio):
 def comprimir_archivo(ruta_archivo):
     directorio, nombre = os.path.split(ruta_archivo)
     nombre_zip = re.sub("xlsx","zip",nombre)
-    ruta_zip = os.path.join(directorio, nombre_zip)
+    ruta_zip = os.path.normpath(os.path.join(directorio, nombre_zip))
 
     with zipfile.ZipFile(ruta_zip, 'w', zipfile.ZIP_DEFLATED) as zipf:
         zipf.write(ruta_archivo, arcname=nombre)
@@ -136,14 +139,14 @@ def comprimir_carpeta(ruta_carpeta, nombre_zip='informes.zip'):
     Retorna:
     str: Ruta completa del archivo zip creado.
     """
-    ruta_zip = os.path.join(ruta_carpeta, nombre_zip)
+    ruta_zip = os.path.normpath(os.path.join(ruta_carpeta, nombre_zip))
 
     with zipfile.ZipFile(ruta_zip, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for carpeta_actual, _, archivos in os.walk(ruta_carpeta):
             for archivo in archivos:
                 if archivo == nombre_zip:
                     continue
-                ruta_completa = os.path.join(carpeta_actual, archivo)
-                ruta_relativa = os.path.relpath(ruta_completa, ruta_carpeta)
+                ruta_completa = os.path.normpath(os.path.join(carpeta_actual, archivo))
+                ruta_relativa = os.path.normpath(os.path.relpath(ruta_completa, ruta_carpeta))
                 zipf.write(ruta_completa, arcname=ruta_relativa)
 

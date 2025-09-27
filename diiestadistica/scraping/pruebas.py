@@ -1,7 +1,8 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
-driver = webdriver.Chrome(ChromeDriverManager().install())
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
 """(myenv) kaliuser@kali:~/Documentos/diiestadistica$ /home/kaliuser/Documentos/diiestadistica/myenv/bin/python /home/kaliuser/Documentos/diiestadistica/diiestadistica/scraping/pruebas.py
 Traceback (most recent call last):

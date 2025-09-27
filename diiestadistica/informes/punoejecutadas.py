@@ -1,7 +1,6 @@
 from openpyxl import load_workbook
 from openpyxl.styles import PatternFill, Font, Alignment
 from openpyxl.utils import get_column_letter
-from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.workbook.workbook import Workbook
 
 import pandas as pd
@@ -27,7 +26,7 @@ def ordenar_y_agrupar_columna_en_libro(workbook: Workbook, nombre_columna: str):
 
         # Leer datos (sin encabezado)
         datos = list(ws.iter_rows(min_row=2, max_row=ws.max_row, max_col=ws.max_column, values_only=True))
-        datos.sort(key=lambda fila: fila[col_idx-1])
+        datos.sort(key=lambda fila: str(fila[col_idx-1]) if fila[col_idx-1] is not None else "")
 
         # Reescribir los datos ordenados
         for i, fila in enumerate(datos, start=2):
@@ -95,10 +94,10 @@ def pu(ruta_global):
     En cada hoja realiza las una intersección con el catalogo de programas y unidades.
     Aplica formato a los encabezados.
     """
-    ruta_reportes = f"{ruta_global}/reportes"
-    ruta_archivo_maestro = f"{ruta_reportes}/archivo_maestro.xlsx"
-    ruta_salida = f"{ruta_reportes}/programas_no_reportados.xlsx"
-    ruta_pu = "/home/kaliuser/Documentos/diiestadistica/historico.xlsx"
+    ruta_reportes = os.path.normpath(os.path.join(ruta_global,"reportes"))
+    ruta_archivo_maestro = os.path.normpath(os.path.join(ruta_reportes,"archivo_maestro.xlsx"))
+    ruta_salida = os.path.normpath(os.path.join(ruta_reportes,"programas_no_reportados.xlsx"))
+    ruta_pu = os.path.normpath(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))),"historico.xlsx"))
     pu = pd.read_excel(ruta_pu)
     base_ruta = os.path.basename(ruta_global)
     anio_objetivo = extraer_anio_de_periodo(base_ruta)
@@ -140,6 +139,9 @@ def pu(ruta_global):
     except Exception as e:
         print(f"Se produjo un error: {e}")
 
+
+if __name__ == "__main__":
+    print(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 """import pandas as pd
 
