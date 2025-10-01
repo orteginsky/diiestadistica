@@ -11,3 +11,5 @@ unidades_academicas.xlsx
 abrir_cmd.bat
 activacion.bat
 credentials.json
+.env
+app.log

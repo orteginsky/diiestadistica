@@ -7,6 +7,11 @@ import pandas as pd
 import re
 import os
 
+from diiestadistica.core.logging_config import setup_logger
+
+logger = setup_logger(__name__)
+
+
 def ordenar_y_agrupar_columna_en_libro(workbook: Workbook, nombre_columna: str):
     """
     Ordena y agrupa por una columna específica en todas las hojas de un Workbook de openpyxl.
@@ -68,6 +73,7 @@ def extraer_anio_de_periodo(periodo: str) -> int:
         anio_inicio, anio_fin = map(int, base.split('-'))
         return anio_fin if semestre == '2' else anio_inicio
     except Exception as e:
+        logger.error(f"Error al extraer el año del periodo: {periodo}. Error: {e}")
         raise ValueError(f"Formato inválido del periodo: {periodo}. Error: {e}")
 
 def filtrar_por_anio_disponible(df, columna_anio: str, anio: int):
@@ -137,18 +143,18 @@ def pu(ruta_global):
         wb.save(ruta_salida)
         
     except Exception as e:
-        print(f"Se produjo un error: {e}")
+        logger.info(f"Se produjo un error: {e}")
 
 
 if __name__ == "__main__":
-    print(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+    logger.info(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 """import pandas as pd
 
 ruta_pu = "/home/kaliuser/Documentos/diiestadistica/historico.xlsx"
 
 pu = pd.read_excel(ruta_pu)
-print(pu.columns)"""
+logger.info(pu.columns)"""
 
 """def anti_join(df1, df2, left_on, right_on):
     # Hacemos un merge para encontrar las coincidencias

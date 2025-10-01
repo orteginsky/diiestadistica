@@ -19,10 +19,14 @@ import pandas as pd
 import os
 import re
 
+from diiestadistica.core.logging_config import setup_logger
+
+logger = setup_logger(__name__)
+
 
 def procesamiento_aplanamiento(ruta_periodo):
 	ruta_xml = os.path.normpath(os.path.join(ruta_periodo,"archivos_originales"))
-	print(ruta_xml)
+	logger.info(ruta_xml)
 	ruta_aplanada = os.path.normpath(os.path.join(ruta_periodo,"archivos_aplanados"))
 	ruta_subtotales = os.path.normpath(os.path.join(ruta_periodo,"subtotales"))
 	periodo = extraer_periodo(ruta_periodo)
@@ -41,7 +45,7 @@ def procesamiento_aplanamiento(ruta_periodo):
 				encabezados_df = expandir_tabla(encabezados_matriz)
 				datos_html = soup.find("tbody").find("tbody")
 				if datos_html:
-					print("Tabla dentro de otro tabla")
+					logger.info("Tabla dentro de otro tabla")
 				else:
 					datos_html = soup.find("tbody")
 				
@@ -96,8 +100,8 @@ def procesamiento_aplanamiento(ruta_periodo):
 				ruta_guardar_subtotales = os.path.normpath(os.path.join(ruta_subtotales,f"{nombre_archivo_guardar}.xlsx"))
 				subtotales.to_excel(ruta_guardar_subtotales, index=False)
 				
-		except:
-			print(nombre_archivo)
+		except Exception as e:
+			logger.info(F"error en el archivo:{nombre_archivo} error:{e}")
 
 def procesamiento_limpieza(ruta_periodo):
 	ruta_aplanada = os.path.normpath(os.path.join(ruta_periodo,"archivos_aplanados"))
@@ -105,9 +109,9 @@ def procesamiento_limpieza(ruta_periodo):
 	ruta_catalogos = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 	ruta_programas = os.path.normpath(os.path.join(ruta_catalogos,"programas.xlsx"))
 	ruta_unidades = os.path.normpath(os.path.join(ruta_catalogos,"unidades_academicas.xlsx"))
-	print(ruta_catalogos)
-	print(ruta_programas)
-	print(ruta_unidades)
+	logger.info(ruta_catalogos)
+	logger.info(ruta_programas)
+	logger.info(ruta_unidades)
 	programas = pd.read_excel(ruta_programas)
 	unidades = pd.read_excel(ruta_unidades)
 	for nombre_archivo in os.listdir(ruta_aplanada):
@@ -139,7 +143,7 @@ def procesamiento_limpieza(ruta_periodo):
 					sin_ceros = dataframe.merge(ceros[left_on], on=left_on, how='left', indicator=True)
 					dataframe = sin_ceros[sin_ceros['_merge'] == 'left_only'].drop(columns=['_merge'])
 				else:
-					print("valio")
+					logger.info("valio")
 					return
 
 				if "Concepto" in dataframe.columns:
@@ -181,8 +185,8 @@ def procesamiento_limpieza(ruta_periodo):
 
 				ruta_homo_guardar = os.path.normpath(os.path.join(ruta_homo,f"{nombre_archivo_guardar}.xlsx"))
 				dataframe_final.to_excel(ruta_homo_guardar, index=False)
-		except:
-			print(nombre_archivo)
+		except Exception as e:
+			logger.info(f"error en el archivo:{nombre_archivo} error:{e}")
 
 
 

@@ -9,6 +9,11 @@ import pandas as pd
 import re
 import os
 
+from diiestadistica.core.logging_config import setup_logger
+
+logger = setup_logger(__name__)
+
+
 def ordenar_y_agrupar_columna_en_libro(workbook: Workbook, nombre_columna: str, orden_deseado: list):
     """
     Ordena y agrupa por una columna específica en todas las hojas de un Workbook de openpyxl.
@@ -132,4 +137,4 @@ def mapre(ruta_global):
         
 
     except Exception as e:
-        print(f"Se produjo un error: {e}")
+        logger.error(f"Se produjo un error: {e}")

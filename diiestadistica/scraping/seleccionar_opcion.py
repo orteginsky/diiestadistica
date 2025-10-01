@@ -1,10 +1,16 @@
+from diiestadistica.scraping.descargar_reportes import descargar_reportes, descargar_reportes_nivel, primer_reporte
+
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
 import time
-from .descargar_reportes import descargar_reportes, descargar_reportes_nivel, primer_reporte
+
+from diiestadistica.core.logging_config import setup_logger
+
+logger = setup_logger(__name__)
+
+
 
 niveles=["MEDIO SUPERIOR","SUPERIOR","POSGRADO"]
 ########################################################################################
@@ -40,7 +46,7 @@ def seleccionar_opcion(driver, palabra, concepto):
             if concepto in i.text.strip():
                 i.click()
     except Exception as e:
-        print(f"Error al seleccionar la opción: {e}")
+        logger.error(f"Error al seleccionar la opción: {e}")
 
 ########################################################################################
 def seleccionar_opcion_nivel(driver, palabra, numero=1):
@@ -74,10 +80,10 @@ def seleccionar_opcion_nivel(driver, palabra, numero=1):
         if opciones_validas and numero <= len(opciones_validas):
             opciones_validas[-numero].click()
         else:
-            print("No hay opciones válidas o el número es demasiado grande")
+            logger.info("No hay opciones válidas o el número es demasiado grande")
 
     except Exception as e:
-        print(f"Error al seleccionar la opción: {e}")
+        logger.error(f"Error al seleccionar la opción: {e}")
 
 ########################################################################################
 def seleccionar_opcion_combo(driver, palabra):
@@ -108,13 +114,13 @@ def seleccionar_opcion_combo(driver, palabra):
             if opcion.text.strip():
                 if opcion.text.strip() in niveles:
                     opcion.click()
-                    print(f"Seleccionada la opción: {opcion.text.strip()}")
+                    logger.info(f"Seleccionada la opción: {opcion.text.strip()}")
                     descargar_reportes(driver)
                     time.sleep(4)
                     div_combo.click()
 
     except Exception as e:
-        print(f"Error al seleccionar el combo box con la palabra '{palabra}': {e}")
+        logger.error(f"Error al seleccionar el combo box con la palabra '{palabra}': {e}")
 
 
 ########################################################################################
@@ -147,13 +153,13 @@ def seleccionar_opcion_combo_descarga(driver, palabra, descarga):
             if opcion.text.strip():
                 if opcion.text.strip() in niveles:
                     opcion.click()
-                    print(f"Seleccionada la opción: {opcion.text.strip()}")
+                    logger.info(f"Seleccionada la opción: {opcion.text.strip()}")
                     descargar_reportes_nivel(driver, descarga)
                     time.sleep(4)
                     div_combo.click()
 
     except Exception as e:
-        print(f"Error al seleccionar el combo box con la palabra '{palabra}': {e}")
+        logger.error(f"Error al seleccionar el combo box con la palabra '{palabra}': {e}")
 
 ########################################################################################
 def seleccionar_opcion_egresados(driver, palabra):
@@ -192,4 +198,4 @@ def seleccionar_opcion_egresados(driver, palabra):
                 div_combo.click()
 
     except Exception as e:
-        print(f"Error al seleccionar el combo box con la palabra '{palabra}': {e}")
+        logger.error(f"Error al seleccionar el combo box con la palabra '{palabra}': {e}")

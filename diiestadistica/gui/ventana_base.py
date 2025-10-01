@@ -7,6 +7,11 @@ from ..scraping.descarga_selenium import descarga_selenium
 from tkinter import filedialog
 import re
 
+from diiestadistica.core.logging_config import setup_logger
+
+logger = setup_logger(__name__)
+
+
 def ventana_base(nueva_ventana,titulo="M A P R E"):
     nueva_ventana.title(titulo)
     nueva_ventana.geometry("900x500")
@@ -66,12 +71,12 @@ def activar_descarga_intranet(ciclo,periodo,download_path):
             if (anio_inicio!=anio_actual or (mes_actual>=8 and semestre_inicio==1 and anio_inicio==anio_actual)):
                 descarga_selenium(anio_inicio,semestre_inicio,download_path)
             else:
-                print("No esta disponible aun la información")
+                logger.warning("No esta disponible aun la información")
                 return
         else:
             return            
     else:
-        print("No se encontró ningún número en el elemento.")
+        logger.warning("No se encontró ningún número en el elemento.")
         return
 
 def limpiar_pestaña(frame):

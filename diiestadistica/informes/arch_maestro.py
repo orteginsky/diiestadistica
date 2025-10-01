@@ -4,6 +4,10 @@ import pandas as pd
 import numpy as np
 import os
 
+from diiestadistica.core.logging_config import setup_logger
+
+logger = setup_logger(__name__)
+
 
 def informes_mapre(ruta_carpeta):
     ruta_homo = os.path.normpath(os.path.join(ruta_carpeta,"archivos_homologados"))
@@ -11,7 +15,7 @@ def informes_mapre(ruta_carpeta):
     archivos_xlsx = [f for f in os.listdir(ruta_homo) if f.endswith(".xlsx")]
     
     if not archivos_xlsx:
-        print("No se encontraron archivos .xlsx en la carpeta.")
+        logger.warning("No se encontraron archivos .xlsx en la carpeta.")
         return None
     
     dataframes = [pd.read_excel(os.path.join(ruta_homo, archivo)) for archivo in archivos_xlsx]

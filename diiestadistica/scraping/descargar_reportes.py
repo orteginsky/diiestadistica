@@ -4,6 +4,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
+from diiestadistica.core.logging_config import setup_logger
+
+logger = setup_logger(__name__)
+
 def descargar_reportes_nivel(driver, descarga):
     """
     Función para hacer clic en las imágenes de Excel dentro de los divs con IDs específicos.
@@ -24,13 +28,13 @@ def descargar_reportes_nivel(driver, descarga):
 
             # Hace clic en la imagen
             excel_img.click()
-            print(f"Descargando reporte: {i}")
+            logger.info(f"Descargando reporte: {i}")
 
             # Espera un poco antes de continuar con el siguiente
             time.sleep(5)
 
     except Exception as e:
-        print(f"Error: {e}")
+        logger.error(f"Error: {e}")
 
 def descargar_reportes(driver):
     """
@@ -48,16 +52,16 @@ def descargar_reportes(driver):
         imagenes_visibles = [img for img in imagenes if img.is_displayed()]
 
         if not imagenes_visibles:
-            print("No hay exceles visibles para descargar.")
+            logger.info("No hay exceles visibles para descargar.")
             return
 
         for img in imagenes_visibles:
             img.click()
-            print("Clic en una imagen de Excel")
+            logger.info("Clic en una imagen de Excel")
             time.sleep(2)  # Pequeña espera entre clics
 
     except Exception as e:
-        print(f"Error al hacer al hacer click en descarga: {e}")
+        logger.error(f"Error al hacer al hacer click en descarga: {e}")
 
 def ultimo_reporte(driver):
     """
@@ -75,13 +79,13 @@ def ultimo_reporte(driver):
         imagenes_visibles = [img for img in imagenes if img.is_displayed()]
 
         if not imagenes_visibles:
-            print("No hay exceles visibles para descargar.")
+            logger.info("No hay exceles visibles para descargar.")
             return
         else:
             imagenes_visibles[-1].click()
             time.sleep(2)
     except Exception as e:
-        print(f"Error al hacer al hacer click en descarga: {e}")
+        logger.error(f"Error al hacer al hacer click en descarga: {e}")
 
 
 def primer_reporte(driver):
@@ -100,11 +104,11 @@ def primer_reporte(driver):
         imagenes_visibles = [img for img in imagenes if img.is_displayed()]
 
         if not imagenes_visibles:
-            print("No hay exceles visibles para descargar.")
+            logger.info("No hay exceles visibles para descargar.")
             return
         else:
             imagenes_visibles[0].click()
             time.sleep(2)
     except Exception as e:
-        print(f"Error al hacer al hacer click en descarga: {e}")
+        logger.error(f"Error al hacer al hacer click en descarga: {e}")
 

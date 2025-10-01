@@ -2,16 +2,20 @@ import tkinter as tk
 from tkinter import ttk
 
 # Importaciones organizadas
-from ..utils.archivo_utils import renombrar_archivos
-from ..utils.os_utils import limpiar_descargas, crear_directorio, mover_archivos
-from ..procesamiento.procesamiento_maestro import procesamiento_aplanamiento
-
-from .ventana_base import (
+from diiestadistica.utils.archivo_utils import renombrar_archivos
+from diiestadistica.utils.os_utils import limpiar_descargas, crear_directorio, mover_archivos
+from diiestadistica.procesamiento.procesamiento_maestro import procesamiento_aplanamiento
+from diiestadistica.gui.ventana_base import (
     ventana_base, agregar_boton, agregar_periodo_box, agregar_ciclo_box, estilizar_pestañas,
     activar_descarga_intranet, seleccionar_carpeta, agregar_textbox, boton_carpeta
 )
 
 import os
+
+from diiestadistica.core.logging_config import setup_logger
+
+logger = setup_logger(__name__)
+
 
 # Funciones de control de interfaz
 def quitar():
@@ -21,16 +25,16 @@ def ir_a_pestaña(n):
     notebook.select(notebook.tabs()[n])
 
 def iniciar():
-    print("Se ha iniciado")
+    logger.info("Se ha iniciado")
     ir_a_pestaña(1)
 
 def limpiar():
-    print("Se ha limpiado")
+    logger.info("Se ha limpiado")
     ir_a_pestaña(2)
     limpiar_descargas()
 
 def descargar(ciclos, periodos):
-    print("Inicio de descarga")
+    logger.info("Inicio de descarga")
     ir_a_pestaña(3)
     activar_descarga_intranet(ciclos.get(), periodos.get())
 
@@ -50,9 +54,9 @@ def depurar_gui(seleccion_textbox, ciclos, periodos):
 
 def homologar_archivos(ruta, boolean):
     if boolean:
-        print(f"se ha homologado tio ruta: {ruta}")
+        logger.info(f"se ha homologado tio ruta: {ruta}")
     else:
-        print("no tio")
+        logger.info("no tio")
 
 def ejecutar_funciones(frame, labels, funciones, idx=0):
     if idx >= len(funciones):
@@ -64,7 +68,7 @@ def ejecutar_funciones(frame, labels, funciones, idx=0):
         labels[idx].config(text="✅", fg="green")
     except Exception as e:
         labels[idx].config(text="❌", fg="red")
-        print(f"Error en la función {idx + 1}: {e}")
+        logger.error(f"Error en la función {idx + 1}: {e}")
     
     frame.after(100, lambda: ejecutar_funciones(frame, labels, funciones, idx + 1))
 

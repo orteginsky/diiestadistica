@@ -3,6 +3,10 @@ from ..utils.archivo_utils import crear_subdirectorios
 
 import pandas as pd
 import os
+
+from diiestadistica.core.logging_config import setup_logger
+
+logger = setup_logger(__name__)
 ruta_catalogos = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
 def homologar_subtotales(ruta_subtotales,ruta_unidades):
@@ -35,7 +39,7 @@ def homologar_subtotales(ruta_subtotales,ruta_unidades):
 					sin_ceros = dataframe.merge(ceros[left_on], on=left_on, how='left', indicator=True)
 					dataframe = sin_ceros[sin_ceros['_merge'] == 'left_only'].drop(columns=['_merge'])
 				else:
-					print("Sin columnas a homologar")
+					logger.warning("Sin columnas a homologar")
 					return
 
 				if "Concepto" in dataframe.columns:
@@ -65,7 +69,7 @@ def homologar_subtotales(ruta_subtotales,ruta_unidades):
 				dataframe = dataframe.merge(unidades, left_on="Unidad.Academica", right_on="nombre_intranet", how="left")
 				dataframe.to_excel(ruta_archivo, index=False)
 		except:
-			print(nombre_archivo)
+			logger.error(nombre_archivo)
 
 def sub_totales_unidad(ruta_global, ruta_unidades, ruta_programas):
 	programas = pd.read_excel(ruta_programas)
@@ -87,7 +91,7 @@ def sub_totales_unidad(ruta_global, ruta_unidades, ruta_programas):
 				write_root = os.path.normpath(os.path.join(ruta_subunidades,nombre_archivo))
 				dataframe.to_excel(write_root, index=False)
 		except:
-			print(nombre_archivo)
+			logger.error(nombre_archivo)
 
 
 def sub_totales_rama(ruta_global, ruta_unidades, ruta_programas):
@@ -111,7 +115,7 @@ def sub_totales_rama(ruta_global, ruta_unidades, ruta_programas):
 				write_root = os.path.normpath(os.path.join(ruta_sub,nombre_archivo))
 				dataframe.to_excel(write_root, index=False)
 		except:
-			print(nombre_archivo)
+			logger.error(nombre_archivo)
 
 def sub_totales_total(ruta_global, ruta_unidades, ruta_programas):
 	programas = pd.read_excel(ruta_programas)
@@ -134,7 +138,7 @@ def sub_totales_total(ruta_global, ruta_unidades, ruta_programas):
 				write_root = os.path.normpath(os.path.join(ruta_sub,nombre_archivo))
 				dataframe.to_excel(write_root, index=False)
 		except:
-			print(nombre_archivo)
+			logger.error(nombre_archivo)
 
 def procesar_subtotales(ruta_global):
     ruta_catalogos = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))

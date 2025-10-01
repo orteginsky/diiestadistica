@@ -2,36 +2,31 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
 
-def credenciales(driver,d_usuario="cglara",d_contraseña="ZyK8nEEA"):
+from diiestadistica.core.logging_config import setup_logger
+from diiestadistica.core.settings import settings
 
+logger = setup_logger(__name__)
+
+def credenciales(driver):
     try:
-        
         # Abre la página de inicio de sesión
-        driver.get("https://intranet.sge.ipn.mx/")
+        driver.get(settings.intranet_url)
 
-        # Espera a que la página cargue
         time.sleep(2)
 
-        # Ingresa las credenciales
         usuario = driver.find_element(By.NAME, "j_username")
-        usuario.send_keys(d_usuario)
+        usuario.send_keys(settings.scraping_usuario)
 
         contraseña = driver.find_element(By.NAME, "j_password")
-        contraseña.send_keys(d_contraseña)
+        contraseña.send_keys(settings.scraping_password)
 
-        # Envía el formulario
         contraseña.send_keys(Keys.RETURN)
-
-        # Espera a que la página cargue después del inicio de sesión
         time.sleep(2)
 
-        # Navega a la página deseada
-        pagina_deseada = "https://intranet.sge.ipn.mx/principal.cfm"
-        driver.get(pagina_deseada)
-
-        # Espera a que el contenido dinámico se cargue
+        driver.get(settings.intranet_home)
         time.sleep(2)
-        return(driver)
+
+        return driver
     except Exception:
-        print("Se produjo un Error")
-        return(driver)
+        logger.error("Se produjo un Error")
+        return driver

@@ -3,20 +3,23 @@ from ..gui.seleccion_archivos import seleccionar_carpeta
 import pandas as pd
 from pathlib import Path
 
+from diiestadistica.core.logging_config import setup_logger
+
+logger = setup_logger(__name__)
 
 def cambiar_extencion_carpeta(old_extension="xls", new_extension="html"):
     carpeta_str = seleccionar_carpeta()
     if carpeta_str is None:
-        print("No se seleccionó ninguna carpeta.")
+        logger.info("No se seleccionó ninguna carpeta.")
         return
     carpeta = Path(carpeta_str)
-    print(f"Haz cambiado los archivos con extensión: {old_extension} por la extensión {new_extension}")
+    logger.info(f"Haz cambiado los archivos con extensión: {old_extension} por la extensión {new_extension}")
 
     for file_path in carpeta.iterdir():
         if file_path.suffix == f".{old_extension}":
             cambiar_extencion_archivo(file_path, new_extension)
         else:
-            print(f"Archivo conservado: {file_path.name}")
+            logger.info(f"Archivo conservado: {file_path.name}")
 
 
 def cambiar_extencion_archivo(file_path: Path, new_extension: str):
@@ -57,19 +60,19 @@ def renombrar_archivos(ruta_carpeta, bolean=False):
         ruta = ruta / "archivos_originales"
 
     if not ruta.is_dir():
-        print(f"Error: La ruta '{ruta}' no es una carpeta válida.")
+        logger.info(f"Error: La ruta '{ruta}' no es una carpeta válida.")
         return
 
     for file_path in ruta.iterdir():
         if file_path.name in diccionario_nombres:
             new_file = ruta / diccionario_nombres[file_path.name]
             if new_file.exists():
-                print(f"Advertencia: No se renombró '{file_path.name}' porque '{new_file.name}' ya existe.")
+                logger.info(f"Advertencia: No se renombró '{file_path.name}' porque '{new_file.name}' ya existe.")
             else:
                 file_path.rename(new_file)
-                print(f"Renombrado: '{file_path.name}' → '{new_file.name}'")
+                logger.info(f"Renombrado: '{file_path.name}' → '{new_file.name}'")
         else:
-            print(f"Sin cambio: '{file_path.name}' no está en el diccionario.")
+            logger.info(f"Sin cambio: '{file_path.name}' no está en el diccionario.")
 
 
 def eliminar_xlsx_vacios(ruta_directorio):
@@ -82,9 +85,9 @@ def eliminar_xlsx_vacios(ruta_directorio):
             df = pd.read_excel(file_path)
             if df.empty or df.dropna(how="all").shape[0] == 0:
                 file_path.unlink()
-                print(f"Archivo eliminado (sin datos): {file_path.name}")
+                logger.info(f"Archivo eliminado (sin datos): {file_path.name}")
         except Exception as e:
-            print(f"No se pudo procesar {file_path.name}: {e}")
+            logger.info(f"No se pudo procesar {file_path.name}: {e}")
 
 
 def crear_subdirectorios(ruta_base, carpetas):
@@ -99,5 +102,5 @@ def crear_subdirectorios(ruta_base, carpetas):
             ruta_carpeta.mkdir(parents=True, exist_ok=True)
             rutas_creadas.append(ruta_carpeta)
         except Exception as e:
-            print(f"No se pudo crear la carpeta '{carpeta}': {e}")
+            logger.info(f"No se pudo crear la carpeta '{carpeta}': {e}")
     return rutas_creadas

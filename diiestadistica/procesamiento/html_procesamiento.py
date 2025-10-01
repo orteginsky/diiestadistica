@@ -1,5 +1,10 @@
-from ..utils.coincidencia import uno
+from diiestadistica.utils.coincidencia import uno
 from bs4 import BeautifulSoup
+
+from diiestadistica.core.logging_config import setup_logger
+
+logger = setup_logger(__name__)
+
 
 def limpiar_html(soup):
     # Paso 1: Eliminar las tablas anidadas en <tr> y mover su contenido

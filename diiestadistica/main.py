@@ -1,39 +1,46 @@
-from .utils.archivo_utils import renombrar_archivos
-from .utils.os_utils import limpiar_descargas
-from .utils.os_utils import crear_directorio
-from .utils.os_utils import comprimir_carpeta
-from .procesamiento.procesamiento_maestro import procesamiento_aplanamiento
-from .procesamiento.procesamiento_maestro import procesamiento_limpieza
-from .procesamiento.procesar_subtotales import procesar_subtotales
-from .informes.arch_maestro import informes_mapre
-from .informes.errores import informe_errores
-from .informes.mapre import mapre
-from .conexion.email import enviar_correo
+from diiestadistica.utils.archivo_utils import renombrar_archivos
+from diiestadistica.utils.os_utils import limpiar_descargas
+from diiestadistica.utils.os_utils import crear_directorio
+from diiestadistica.utils.os_utils import comprimir_carpeta
+from diiestadistica.procesamiento.procesamiento_maestro import procesamiento_aplanamiento
+from diiestadistica.procesamiento.procesamiento_maestro import procesamiento_limpieza
+from diiestadistica.procesamiento.procesar_subtotales import procesar_subtotales
+from diiestadistica.informes.arch_maestro import informes_mapre
+from diiestadistica.informes.errores import informe_errores
+from diiestadistica.informes.mapre import mapre
+from diiestadistica.conexion.email import enviar_correo
 
-from .gui.ventana_base import ventana_base
-from .gui.ventana_base import agregar_boton
-from .gui.ventana_base import agregar_periodo_box
-from .gui.ventana_base import agregar_ciclo_box
-from .gui.ventana_base import estilizar_pestañas
-from .gui.ventana_base import activar_descarga_intranet
-from .gui.ventana_base import seleccionar_carpeta
-from .gui.ventana_base import agregar_textbox
-from .gui.ventana_base import boton_carpeta
+from diiestadistica.gui.ventana_base import ventana_base
+from diiestadistica.gui.ventana_base import agregar_boton
+from diiestadistica.gui.ventana_base import agregar_periodo_box
+from diiestadistica.gui.ventana_base import agregar_ciclo_box
+from diiestadistica.gui.ventana_base import estilizar_pestañas
+from diiestadistica.gui.ventana_base import activar_descarga_intranet
+from diiestadistica.gui.ventana_base import seleccionar_carpeta
+from diiestadistica.gui.ventana_base import agregar_textbox
+from diiestadistica.gui.ventana_base import boton_carpeta
+from diiestadistica.core.settings import settings
 
 import tkinter as tk
 from tkinter import ttk
 import os
 
+from diiestadistica.core.logging_config import setup_logger
+
+logger = setup_logger(__name__)
+
 def quitar():
+    logger.info("quitar en ejecucion")
     notebook.destroy()
     root.destroy()
 def ir_a_pestaña_n(n):
+    logger.info(f"navegando a la pestaña {n}")
     notebook.select(notebook.tabs()[n])
 def iniciar():
-    print("se ha iniciado")
+    logger.info("se ha iniciado")
     ir_a_pestaña_n(1)
 def limpiar():
-    print("se ha limpiado")
+    logger.info("se ha limpiado")
     ir_a_pestaña_n(2)
     limpiar_descargas()
 
@@ -42,19 +49,20 @@ def generar_ruta(seleccion_textbox, ciclos, periodos):
     ciclo = ciclos.get()
     periodo = periodos.get()
     ruta_base = os.path.normpath(os.path.join(carpeta, f"periodo_{ciclo}_{periodo}"))
-    print(ruta_base)
+    logger.info(f"se ha generado la siguiente ruta:{ruta_base}")
     return ruta_base
 
 def descargar(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
-    print(ruta_base)
+    logger.info(f"se ha generado la siguiente ruta:{ruta_base}")
     crear_directorio(ruta_base)
     ir_a_pestaña_n(2)
     ciclo = ciclos.get()
     periodo = periodos.get() 
-    print(ciclo, periodo)
+    logger.info(f"ciclo selecionado:{ciclo} y perido selecionado:{periodo}")
+    logger.info(f"se descargara en base al siguiente {ruta_base}")
     download_path = os.path.normpath(os.path.join(ruta_base, "archivos_originales"))
-    print(download_path)
+    logger.info(download_path)
     activar_descarga_intranet(ciclo, periodo, download_path)
 
 def zip_gui(seleccion_textbox, ciclos, periodos):
@@ -65,16 +73,17 @@ def zip_gui(seleccion_textbox, ciclos, periodos):
 def enviar_correo_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
     ruta_zip = os.path.normpath(os.path.join(ruta_base, "reportes"))
-    print(ruta_zip)
-    lista_correos = ['luisortegar99@gmail.com','lortegar1401@alumno.ipn.mx']
+    logger.info(ruta_zip)
+    lista_correos = settings.emails_destinatarios
+    logger.info(f"se enviara a los siguientes correos:{lista_correos}")
     for correo in lista_correos:
         enviar_correo(ruta_zip, correo)
 
 def depurar(ruta_base, bolean = False):
     if bolean:
-        print(f"se depuro en{ruta_base}")
+        logger.info(f"se depuro en{ruta_base}")
     else:
-        print("se depuro")
+        logger.info("se depuro")
 
 def renombrar_archivos_gui(seleccion_textbox, ciclos, periodos, boolean= True):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
@@ -122,7 +131,7 @@ def ejecutar_funciones(frame, labels, funciones, idx=0):
         labels[idx].config(text="✅", fg="green")
     except Exception as e:
         labels[idx].config(text="❌", fg="red")
-        print(f"Error en la función {idx + 1}: {e}")
+        logger.info(f"Error en la función {idx + 1}: {e}")
 
     # Llamar a la siguiente función después de terminar
     frame.after(100, lambda: ejecutar_funciones(frame, labels, funciones, idx + 1))

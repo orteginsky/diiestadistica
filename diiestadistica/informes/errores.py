@@ -2,6 +2,11 @@ import pandas as pd
 import os
 import re
 
+from diiestadistica.core.logging_config import setup_logger
+
+logger = setup_logger(__name__)
+
+
 def anti_join(df1, df2, on):
     filas_repetidas = pd.merge(df1, df2[on], on=on, how='inner')
     condicion = ~df1.set_index(on).index.isin(filas_repetidas.set_index(on).index)
@@ -26,21 +31,21 @@ def informe_errores(ruta_global,lista=['Datos']):
                     dataframe = pd.read_excel(ruta_anti)
                     dataframe_base = anti_join(dataframe_base, dataframe, lista)
             if dataframe_base.empty or dataframe_base.dropna(how='all').shape[0] == 0:
-                print("subtotal bien")
+                logger.info("subtotal bien")
             else:
                 lista_dataframes.append(dataframe_base)
                 nombre_hojas.append(re.sub('\\.xlsx','',nombre_archivo))
 
         except Exception as e:
-            print(f"No se pudo abrir {nombre_archivo}: {e}")
+            logger.error(f"No se pudo abrir {nombre_archivo}: {e}")
             continue
     
     if lista_dataframes:
         ruta_archivo_errores = os.path.normpath(os.path.join(ruta_errores,"informe.xlsx"))
-        print(f"❌ Se encontraron errores, revisa el informe en: {ruta_archivo_errores}")
+        logger.warning(f"❌ Se encontraron errores, revisa el informe en: {ruta_archivo_errores}")
         with pd.ExcelWriter(ruta_archivo_errores, engine='openpyxl') as writer:
             for df, hoja in zip(lista_dataframes, nombre_hojas):
                 df.to_excel(writer, sheet_name=hoja, index=False)
     else:
-        print("✅ No se encontraron errores para reportar.")
+        logger.warning("✅ No se encontraron errores para reportar.")
 

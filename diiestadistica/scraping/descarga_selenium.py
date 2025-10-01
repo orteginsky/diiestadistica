@@ -46,6 +46,10 @@ import time
 import pandas as pd
 import os
 
+from diiestadistica.core.logging_config import setup_logger
+
+logger = setup_logger(__name__)
+
 def descarga_selenium(
         año_inicio: int = 2023,
         semestre:int  = 2,
@@ -54,7 +58,7 @@ def descarga_selenium(
     # Configurar las opciones de Chrome
     if not download_path:
         download_path = os.path.join(os.path.expanduser("~"), "Downloads")
-    print(f"Archivos se descargarán en: {download_path}")
+    logger.info(f"Archivos se descargarán en: {download_path}")
     chrome_options = Options()
     prefs = {
         "download.default_directory": download_path,
@@ -104,7 +108,7 @@ def descarga_selenium(
         ciclo_fin = str((año_inicio - 1)) + " - " + str((año_inicio))
         semestre_fin = "/2"
     else:
-        print("Selección de periodo fuera de rango") 
+        logger.warning("Selección de periodo fuera de rango") 
 
 
 
@@ -164,9 +168,9 @@ def descarga_selenium(
             time.sleep(2)
             seleccionar_opcion_combo(driver, "Nivel:")
             time.sleep(1)
-            print("ok")
+            logger.info("ok")
         else:
-            print("error concepto fuera de rango")
+            logger.info("error concepto fuera de rango")
         
     # Cierra el navegador
     time.sleep(70)

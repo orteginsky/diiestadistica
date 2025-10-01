@@ -1,12 +1,17 @@
 #funciones externas
-from .html_procesamiento import validar_rectangulo
-from .limpieza import capitalizar
-from .limpieza import limpiar_nombre_columna
+from diiestadistica.procesamiento.html_procesamiento import validar_rectangulo
+from diiestadistica.procesamiento.limpieza import capitalizar
+from diiestadistica.procesamiento.limpieza import limpiar_nombre_columna
 
 #importar librerias
 import pandas as pd
 import numpy as np
 import re
+
+from diiestadistica.core.logging_config import setup_logger
+
+logger = setup_logger(__name__)
+
 
 def expandir_tabla(lista_matrices):
     """
