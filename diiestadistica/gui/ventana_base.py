@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from datetime import datetime
 from tkinter.ttk import *
-from ..scraping.descarga_selenium import descarga_selenium
+from diiestadistica.scraping.descarga_selenium import descarga_selenium
 
 from tkinter import filedialog
 import re

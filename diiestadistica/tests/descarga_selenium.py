@@ -1,3 +1,3 @@
-from ..scraping.descarga_selenium import descarga_selenium
+from diiestadistica.scraping.descarga_selenium import descarga_selenium
 
 descarga_selenium()

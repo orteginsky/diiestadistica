@@ -1,9 +1,9 @@
-from ..procesamiento.procesar_subtotales import crear_subdirectorios
-from ..procesamiento.procesar_subtotales import sub_totales_unidad
-from ..procesamiento.procesar_subtotales import sub_totales_rama
-from ..procesamiento.procesar_subtotales import sub_totales_total
-from ..procesamiento.procesar_subtotales import procesar_subtotales
-from ..gui.seleccion_archivos import seleccionar_carpeta
+from diiestadistica.procesamiento.procesar_subtotales import crear_subdirectorios
+from diiestadistica.procesamiento.procesar_subtotales import sub_totales_unidad
+from diiestadistica.procesamiento.procesar_subtotales import sub_totales_rama
+from diiestadistica.procesamiento.procesar_subtotales import sub_totales_total
+from diiestadistica.procesamiento.procesar_subtotales import procesar_subtotales
+from diiestadistica.gui.seleccion_archivos import seleccionar_carpeta
 
 ruta = seleccionar_carpeta()
 #carpetas=["sub_totales_unidad","sub_totales_rama","totales"]

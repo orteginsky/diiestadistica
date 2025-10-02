@@ -1,4 +1,4 @@
-from ..gui.seleccion_archivos import seleccionar_carpeta
+from diiestadistica.gui.seleccion_archivos import seleccionar_carpeta
 
 import pandas as pd
 from pathlib import Path
@@ -8,6 +8,7 @@ from diiestadistica.core.logging_config import setup_logger
 logger = setup_logger(__name__)
 
 def cambiar_extencion_carpeta(old_extension="xls", new_extension="html"):
+    logger.info("se ha iniciado la función cambiar_extencion_carpeta")
     carpeta_str = seleccionar_carpeta()
     if carpeta_str is None:
         logger.info("No se seleccionó ninguna carpeta.")

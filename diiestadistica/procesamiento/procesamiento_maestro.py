@@ -1,16 +1,16 @@
 #Funciones extra-externas
-from ..utils.coincidencia import coincidencia
-from ..utils.os_utils import extraer_periodo
+from diiestadistica.utils.coincidencia import coincidencia
+from diiestadistica.utils.os_utils import extraer_periodo
 #funciones externas
-from .html_procesamiento import procesar_tabla_html
-from .html_procesamiento import limpiar_html
-from .transformaciones import expandir_tabla
-from .transformaciones import definir_encabezados
-from .transformaciones import eliminar_columnas_subtotales
-from .transformaciones import reorganizar_datos
-from .transformaciones import generar_columnas
-from .transformaciones import dividir_subtotales
-from .limpieza import limpiar_nombres_programas
+from diiestadistica.procesamiento.html_procesamiento import procesar_tabla_html
+from diiestadistica.procesamiento.html_procesamiento import limpiar_html
+from diiestadistica.procesamiento.transformaciones import expandir_tabla
+from diiestadistica.procesamiento.transformaciones import definir_encabezados
+from diiestadistica.procesamiento.transformaciones import eliminar_columnas_subtotales
+from diiestadistica.procesamiento.transformaciones import reorganizar_datos
+from diiestadistica.procesamiento.transformaciones import generar_columnas
+from diiestadistica.procesamiento.transformaciones import dividir_subtotales
+from diiestadistica.procesamiento.limpieza import limpiar_nombres_programas
 
 #funciones particulares
 from bs4 import BeautifulSoup

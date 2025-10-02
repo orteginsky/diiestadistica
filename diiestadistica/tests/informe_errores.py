@@ -1,5 +1,5 @@
-from ..gui.seleccion_archivos import seleccionar_carpeta
-from ..informes.errores import informe_errores
+from diiestadistica.gui.seleccion_archivos import seleccionar_carpeta
+from diiestadistica.informes.errores import informe_errores
 
 ruta = seleccionar_carpeta()
 informe_errores(ruta)

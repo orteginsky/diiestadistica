@@ -1,5 +1,5 @@
-from ..utils.archivo_utils import eliminar_xlsx_vacios
-from ..utils.archivo_utils import crear_subdirectorios
+from diiestadistica.utils.archivo_utils import eliminar_xlsx_vacios
+from diiestadistica.utils.archivo_utils import crear_subdirectorios
 
 import pandas as pd
 import os
