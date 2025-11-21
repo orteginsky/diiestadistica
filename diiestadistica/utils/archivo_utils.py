@@ -76,20 +76,28 @@ def renombrar_archivos(ruta_carpeta, bolean=False):
             logger.info(f"Sin cambio: '{file_path.name}' no está en el diccionario.")
 
 
-def eliminar_xlsx_vacios(ruta_directorio):
+def eliminar_xlsx_vacios(ruta_directorio: str) -> None:
     """
-    Elimina archivos .xlsx que solo tienen encabezados sin datos desde un directorio dado.
+    Elimina archivos .xlsx que solo tienen encabezados sin datos o están completamente vacíos
+    desde un directorio dado.
     """
     ruta = Path(ruta_directorio)
+
     for file_path in ruta.glob("*.xlsx"):
         try:
-            df = pd.read_excel(file_path)
-            if df.empty or df.dropna(how="all").shape[0] == 0:
-                file_path.unlink()
-                logger.info(f"Archivo eliminado (sin datos): {file_path.name}")
-        except Exception as e:
-            logger.info(f"No se pudo procesar {file_path.name}: {e}")
+            # Leemos el archivo completo sin asumir encabezado
+            df = pd.read_excel(file_path, header=None)
 
+            # Si tiene solo una fila (posible encabezado) o todas vacías
+            if df.shape[0] <= 1 or df.dropna(how="all").shape[0] == 0:
+                file_path.unlink()
+                logger.info(f"Archivo eliminado (solo encabezado o vacío): {file_path.name}")
+            else:
+                logger.debug(f"Archivo con datos válidos: {file_path.name}")
+
+        except Exception as e:
+            logger.warning(f"No se pudo procesar {file_path.name}: {e}")
+            
 
 def crear_subdirectorios(ruta_base, carpetas):
     """

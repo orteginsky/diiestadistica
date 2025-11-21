@@ -33,7 +33,7 @@ def limpiar_nombre_columna(nombre):
 
     # Eliminar caracteres no permitidos en nombres de columnas
     nombre = re.sub(r'[^a-zA-Z0-9_.]', '', nombre)
-
+    
     return nombre
 
 def limpiar_nombres_programas(dataframe, columna):

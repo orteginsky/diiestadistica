@@ -163,17 +163,17 @@ def descarga_selenium(
             seleccionar_opcion_combo_descarga(driver, "Nivel:", descarga)
         elif text=="Matrícula Inscrita Por Grupos De Edad":
             seleccionar_opcion(driver, "Ciclo Escolar:", ciclo_incio)
-            time.sleep(2)
+            time.sleep(3)
             seleccionar_opcion(driver, "Periodo:", semestre_inicio)
-            time.sleep(2)
+            time.sleep(3)
             seleccionar_opcion_combo(driver, "Nivel:")
-            time.sleep(1)
+            time.sleep(3)
             logger.info("ok")
         else:
             logger.info("error concepto fuera de rango")
         
     # Cierra el navegador
-    time.sleep(70)
+    time.sleep(140)
     driver.quit()
 
 #_________________________T O D O ____ B I E N______A R R I B A_____________

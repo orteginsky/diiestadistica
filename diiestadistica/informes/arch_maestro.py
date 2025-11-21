@@ -63,6 +63,7 @@ def informes_mapre(ruta_carpeta):
         "Concepto",
         "Turno",
         "Sexo",
+        "Fin_periodo",
         "Datos"]]
     #"""
     df_final.to_excel(ruta_informe,index=False)

@@ -45,16 +45,19 @@ def limpiar():
     limpiar_descargas()
 
 def generar_ruta(seleccion_textbox, ciclos, periodos):
+    logger.debug("inicio de generar_ruta")
     carpeta = seleccion_textbox.get()
     ciclo = ciclos.get()
     periodo = periodos.get()
     ruta_base = os.path.normpath(os.path.join(carpeta, f"periodo_{ciclo}_{periodo}"))
     logger.info(f"se ha generado la siguiente ruta:{ruta_base}")
+    logger.debug("fin de generar_ruta")
     return ruta_base
 
 def descargar(seleccion_textbox, ciclos, periodos):
+    logger.debug("inicio de descargar")
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
-    logger.info(f"se ha generado la siguiente ruta:{ruta_base}")
+    logger.info(f"se ha generado la siguiente ruta para la función descargar:{ruta_base}")
     crear_directorio(ruta_base)
     ir_a_pestaña_n(2)
     ciclo = ciclos.get()
@@ -64,13 +67,17 @@ def descargar(seleccion_textbox, ciclos, periodos):
     download_path = os.path.normpath(os.path.join(ruta_base, "archivos_originales"))
     logger.info(download_path)
     activar_descarga_intranet(ciclo, periodo, download_path)
+    logger.debug("fin de descargar")
 
 def zip_gui(seleccion_textbox, ciclos, periodos):
+    logger.debug("inicio de zip_gui")
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
     ruta_informes = os.path.normpath(os.path.join(ruta_base, "reportes"))
     comprimir_carpeta(ruta_informes)
+    logger.debug("fin de ")
 
 def enviar_correo_gui(seleccion_textbox, ciclos, periodos):
+    logger.debug("inicio de enviar_correo_gui")
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
     ruta_zip = os.path.normpath(os.path.join(ruta_base, "reportes"))
     logger.info(ruta_zip)
@@ -78,6 +85,7 @@ def enviar_correo_gui(seleccion_textbox, ciclos, periodos):
     logger.info(f"se enviara a los siguientes correos:{lista_correos}")
     for correo in lista_correos:
         enviar_correo(ruta_zip, correo)
+    logger.debug("fin de enviar_correo_gui")
 
 def depurar(ruta_base, bolean = False):
     if bolean:
@@ -87,31 +95,38 @@ def depurar(ruta_base, bolean = False):
 
 def renombrar_archivos_gui(seleccion_textbox, ciclos, periodos, boolean= True):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    logger.debug(f"se esta ejecutando renombrar_archivos_gui y se genero la ruta {ruta_base}")
     renombrar_archivos(ruta_base, boolean)
 
     
 def depurar_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    logger.debug(f"se esta ejecutando depurar_gui y se genero la ruta {ruta_base}")
     procesamiento_aplanamiento(ruta_base)
 
 def homologar_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    logger.debug(f"se esta ejecutando homologar_gui y se genero la ruta {ruta_base}")
     procesamiento_limpieza(ruta_base)
 
 def procesar_subtotales_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    logger.debug(f"se esta ejecutando procesar_subtotales_gui y se genero la ruta {ruta_base}")
     procesar_subtotales(ruta_base)
 
 def archivo_maestro_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    logger.debug(f"se esta ejecutando archivo_maestro_gui y se genero la ruta {ruta_base}")
     informes_mapre(ruta_base)
 
 def errores_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    logger.debug(f"se esta ejecutando errores_gui y se genero la ruta {ruta_base}")
     informe_errores(ruta_base)
 
 def mapre_gui(seleccion_textbox, ciclos, periodos):
     ruta_base = generar_ruta(seleccion_textbox, ciclos, periodos)
+    logger.debug(f"se esta ejecutando mapre_gui y se genero la ruta {ruta_base}")
     mapre(ruta_base)
 
 def ejecutar_funciones(frame, labels, funciones, idx=0):
@@ -123,6 +138,7 @@ def ejecutar_funciones(frame, labels, funciones, idx=0):
     :param funciones: Lista de tuplas (función, argumentos).
     :param idx: Índice de la función actual (para llamadas recursivas).
     """
+    logger.debug("inicio de ejecutar_funciones")
     if idx >= len(funciones):
         return
     func, args = funciones[idx]
@@ -132,9 +148,10 @@ def ejecutar_funciones(frame, labels, funciones, idx=0):
     except Exception as e:
         labels[idx].config(text="❌", fg="red")
         logger.info(f"Error en la función {idx + 1}: {e}")
-
+    
     # Llamar a la siguiente función después de terminar
     frame.after(100, lambda: ejecutar_funciones(frame, labels, funciones, idx + 1))
+    logger.debug("fin de ejecutar_funciones")
 
 root = tk.Tk()
 root = ventana_base(root,"I N I C I O")

@@ -35,6 +35,7 @@ def procesamiento_aplanamiento(ruta_periodo):
 	else:
 		periodo = ""
 	for nombre_archivo in os.listdir(ruta_xml):
+		logger.debug(f"se aplanara el archivo: {nombre_archivo}")
 		try:
 			if nombre_archivo.endswith("xls"):
 				ruta_archivo = os.path.normpath(os.path.join(ruta_xml,nombre_archivo))
@@ -79,6 +80,7 @@ def procesamiento_aplanamiento(ruta_periodo):
 							coincidencia('NMS_Aprovechamiento',nombre_archivo) or \
 								coincidencia('NS_Aprovechamiento',nombre_archivo) or \
 									coincidencia('NP_Basica',nombre_archivo):
+					logger.debug(f"Se renombraron las columnas de {nombre_archivo}")
 					datos_exp.rename(columns={'col_1':'Concepto','col_2':'Sexo'}, inplace= True)
 				elif coincidencia('Semestre',nombre_archivo) or \
 					coincidencia('NMS_Basica',nombre_archivo) or \
@@ -86,8 +88,10 @@ def procesamiento_aplanamiento(ruta_periodo):
 							coincidencia('NMS_Grupos',nombre_archivo) or \
 								coincidencia('NP_Grupos',nombre_archivo) or \
 									coincidencia('NS_Grupos',nombre_archivo):
+					logger.debug(f"Se renombraron las columnas de {nombre_archivo}")
 					datos_exp.rename(columns={'col_2':'Concepto','col_3':'Sexo'}, inplace= True)
 				elif coincidencia('NP_Titulados',nombre_archivo):
+					logger.debug(f"Se renombraron las columnas de {nombre_archivo}")
 					datos_exp.rename(columns={'col_1':'Periodo','col_2':'Sexo'}, inplace= True)
 
 				datos_exp.rename(columns=lambda col: 'Unidad.Academica' if coincidencia('Dependencia', col) else col, inplace=True)
